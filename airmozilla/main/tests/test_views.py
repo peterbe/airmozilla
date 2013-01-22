@@ -16,7 +16,8 @@ from airmozilla.main.models import (
     EventOldSlug,
     Participant,
     Tag,
-    UserProfile
+    UserProfile,
+    Channel
 )
 
 
@@ -29,6 +30,8 @@ class TestPages(TestCase):
         event.start_time = datetime.datetime.utcnow().replace(tzinfo=utc)
         event.archive_time = None
         event.save()
+
+        self.main_channel = Channel.objects.get(slug='main')
 
     def test_can_view_event(self):
         event = Event.objects.get(title='Test event')
@@ -267,6 +270,7 @@ class TestPages(TestCase):
         event1.start_time -= delay
         event1.archive_time = event1.start_time
         event1.save()
+
         eq_(Event.objects.approved().count(), 1)
         eq_(Event.objects.archived().count(), 1)
 
@@ -279,6 +283,7 @@ class TestPages(TestCase):
             status=event1.status,
             placeholder_img=event1.placeholder_img,
         )
+        event2.channels.add(self.main_channel)
 
         eq_(Event.objects.approved().count(), 2)
         eq_(Event.objects.archived().count(), 2)

@@ -1,0 +1,16 @@
+{% extends 'main/main_base.html' %}
+{% set page='channels' %}
+
+{% block banner %}
+    {% include 'main/_banner_small.html' %}
+{% endblock %}
+
+{% block content_main %}
+  <h2 class="section-title">Channels</h2>
+  <div class="channels">
+  {% for channel, event_count in channels %}
+    <h3><a href="{{ url('main:home_channels', channel.slug) }}">{{ channel.name }}</a></h3>
+    <p>{{ event_count }} archived events</p>
+  {% endfor %}
+  </div>
+{% endblock %}

@@ -15,7 +15,7 @@ from funfactory.urlresolvers import reverse
 from jingo import Template
 
 from airmozilla.main.models import (
-    Event, EventOldSlug, Participant, Tag, get_profile_safely
+    Event, EventOldSlug, Participant, Tag, get_profile_safely, Channel
 )
 from airmozilla.base.utils import (
     paginate, vidly_tokenize, edgecast_tokenize, unhtml,
@@ -29,8 +29,16 @@ def page(request, template):
     return render(request, template)
 
 
-def home(request, page=1):
+def home(request, page=1, channel_slug=None):
     """Paginated recent videos and live videos."""
+    if channel_slug:
+        channel = get_object_or_404(Channel, slug=channel_slug)
+    else:
+        channel, __ = Channel.objects.get_or_create(
+            name='Main',
+            slug='main',
+        )
+
     privacy_filter = {}
     privacy_exclude = {}
     if request.user.is_active:
@@ -72,13 +80,17 @@ def home(request, page=1):
         # no live events when filtering by tag
         live_events = Event.objects.none()
     else:
-
         live_events = (Event.objects.live()
                        .order_by('start_time'))
         if privacy_filter:
             live_events = live_events.filter(**privacy_filter)
         elif privacy_exclude:
             live_events = live_events.exclude(**privacy_exclude)
+
+    # apply the mandatory channels filter
+    live_events = live_events.filter(channels=channel)
+    archived_events = archived_events.filter(channels=channel)
+
     archived_paged = paginate(archived_events, page, 10)
     live = None
     also_live = []
@@ -90,6 +102,7 @@ def home(request, page=1):
         'also_live': also_live,
         'tags': tags,
         'Event': Event,
+        'channel': channel,
     })
 
 
@@ -267,3 +280,12 @@ class EventsFeed(Feed):
 
     def item_pubdate(self, event):
         return event.start_time
+
+
+def channels(request):
+    channels = []
+    for channel in Channel.objects.all():  # XXX? exclude(slug='main'):
+        event_count = Event.objects.archived().filter(channels=channel).count()
+        channels.append((channel, event_count))
+
+    return render(request, 'main/channels.html', {'channels': channels})

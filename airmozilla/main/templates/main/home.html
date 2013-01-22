@@ -48,9 +48,22 @@
     </article>
     {% endif %}
     {% if not tags %}
-    <h2 class="section-title">
-      {{ _('Recent Videos') }}
-    </h2>
+      {% if channel.slug == 'main' %}
+        <h2 class="section-title">{{ _('Recent Videos') }}</h2>
+      {% else %}
+        {% if channel.image and channel.image_is_banner %}
+          {% set thumb = thumbnail(channel.image, '650') %}
+          <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+               alt="{{ channel.name }}">
+        {% else %}
+          {% if channel.image %}
+            {% set thumb = thumbnail(channel.image, '100x100') %}
+            <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+                 alt="{{ channel.name }}" class="channel-thumbnail">
+            {% endif %}
+            <h2 class="section-title">{{ channel.name }}</h2>
+        {% endif %}
+      {% endif %}
     {% endif %}
   {% endif %}
 
