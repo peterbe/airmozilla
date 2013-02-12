@@ -1,0 +1,6 @@
+{% include 'suggest/_alert_form_errors.html' %}
+<form method="post" enctype="multipart/form-data" class="form-horizontal">
+    {{ csrf() }}
+    {{ bootstrapform(form) }}
+    {% include 'suggest/_form_buttons.html' %}
+</form>

@@ -1,0 +1,49 @@
+{% extends 'suggest/suggest_base.html' %}
+{% set page='suggest' %}
+
+{% block page_title %}
+Suggest a new event | {{ super() }}
+{% endblock %}
+
+{% block banner %}
+    {% include 'main/_banner_small.html' %}
+{% endblock %}
+
+{% block content_main %}
+
+{% for event in suggestions %}
+  {% if loop.first %}
+  <h2 class="section-title">Incomplete event suggestions</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Event title</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+  {% endif %}
+
+  <tr>
+    <td>
+      <a href="{{ next_url(event) }}">{{ event.title }}</a>
+    </td>
+    <td>
+      {{ state_description(event) }}
+    </td>
+  </tr>
+
+  {% if loop.last %}
+    </tbody>
+  </table>
+  {% endif %}
+
+{% endfor %}
+
+
+  <h2 class="section-title">Suggest a new event</h2>
+  <h3 class="section-sub-title">What are you going to call it?</h3>
+
+  {% include 'suggest/_default_form.html' %}
+
+{% endblock %}

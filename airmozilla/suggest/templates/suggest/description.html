@@ -1,0 +1,17 @@
+{% extends 'suggest/suggest_base.html' %}
+
+{% block page_title %}
+Event description | {{ super() }}
+{% endblock %}
+
+{% block banner %}
+    {% include 'main/_banner_small.html' %}
+{% endblock %}
+
+{% block content_main %}
+  <h2 class="section-title">Event description</h2>
+  <h3 class="section-sub-title">Give a description of the event</h3>
+
+  {% include 'suggest/_default_form.html' %}
+
+{% endblock %}
