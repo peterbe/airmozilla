@@ -1,8 +1,15 @@
 from django import forms
 from django.template.defaultfilters import slugify
+from django.conf import settings
 
 from airmozilla.base.forms import BaseModelForm
-from airmozilla.main.models import SuggestedEvent, Event, Tag, Participant
+from airmozilla.main.models import (
+    SuggestedEvent,
+    Event,
+    Tag,
+    Participant,
+    Channel
+)
 
 
 class StartForm(BaseModelForm):
@@ -51,6 +58,10 @@ class DetailsForm(BaseModelForm):
             'additional_links',
         )
 
+    def __init__(self, *args, **kwargs):
+        super(DetailsForm, self).__init__(*args, **kwargs)
+        self.fields['channels'].required = False
+
     def clean_tags(self):
         tags = self.cleaned_data['tags']
         split_tags = [t.strip() for t in tags.split(',') if t.strip()]
@@ -59,6 +70,12 @@ class DetailsForm(BaseModelForm):
             t, __ = Tag.objects.get_or_create(name=tag_name)
             final_tags.append(t)
         return final_tags
+
+    def clean_channels(self):
+        channels = self.cleaned_data['channels']
+        if not channels:
+            channels.append(Channel.objects.get(slug=settings.DEFAULT_CHANNEL_SLUG))
+        return channels
 
 
 class PlaceholderForm(BaseModelForm):

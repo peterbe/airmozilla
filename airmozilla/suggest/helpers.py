@@ -9,41 +9,54 @@ _STATES = [
         'description': 'Submitted'
     },
     {
-        'required': ['description'],
+        'not': ['description'],
         'view': 'suggest:description',
-        'description': 'No description entered'
+        'description': 'Description not entered'
     },
     {
-        'required': ['start_time', 'location', 'privacy'],
+        'not': ['start_time', 'location', 'privacy'],
         'view': 'suggest:details',
         'description': 'Details missing',
     },
     {
-        'required': ['placeholder_img'],
+        'not': ['placeholder_img'],
         'view': 'suggest:placeholder',
         'description': 'No placeholder image',
     },
     {
-        'required': [lambda event: event.participants.all().count()],
+        'not': [lambda event: event.participants.all().count()],
         'view': 'suggest:participants',
         'description': 'No participants selected'
     },
 ]
 
+_DEFAULT_STATE = {
+    'view': 'suggest:summary',
+    'description': 'Not yet submitted',
+}
+
 
 def _get_state(event):
     for state in _STATES:
         if state.get('required'):
-            all = True
-            for must in state['required']:
-                if isinstance(must, basestring):
-                    if not getattr(event, must, None):
-                        all = False
-                else:
-                    if not must(event):
-                        all = False
+            requirements = state['required']
+        else:
+            requirements = state['not']
+        all = True
+        for requirement in requirements:
+            if isinstance(requirement, basestring):
+                if not getattr(event, requirement, None):
+                    all = False
+            else:
+                if not requirement(event):
+                    all = False
+        if state.get('required'):
             if all:
                 return state
+        else:
+            if not all:
+                return state
+    return _DEFAULT_STATE
 
 
 @register.function

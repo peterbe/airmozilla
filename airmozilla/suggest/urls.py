@@ -10,4 +10,5 @@ urlpatterns = patterns(
     url(r'^(?P<id>\d+)/image/$', views.placeholder, name='placeholder'),
     url(r'^(?P<id>\d+)/participants/$', views.participants,
         name='participants'),
+    url(r'^(?P<id>\d+)/summary/$', views.summary, name='summary'),
 )

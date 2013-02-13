@@ -46,7 +46,7 @@ def description(request, id):
             url = reverse('suggest:details', args=(event.pk,))
             return redirect(url)
     else:
-        form = forms.DescriptionForm()
+        form = forms.DescriptionForm(instance=event)
 
     return render(request, 'suggest/description.html', {'form': form})
 
@@ -66,7 +66,7 @@ def details(request, id):
             url = reverse('suggest:placeholder', args=(event.pk,))
             return redirect(url)
     else:
-        form = forms.DetailsForm()
+        form = forms.DetailsForm(instance=event)
 
     return render(request, 'suggest/details.html', {'form': form})
 
@@ -111,3 +111,12 @@ def participants(request, id):
         form = form_class(instance=event)
 
     return render(request, 'suggest/participants.html', {'form': form})
+
+
+@login_required
+def summary(request, id):
+    event = get_object_or_404(SuggestedEvent, pk=id)
+    if event.user != request.user:
+        return http.HttpResponseBadRequest('Not your event')
+
+    return render(request, 'suggest/summary.html', {'event': event})
