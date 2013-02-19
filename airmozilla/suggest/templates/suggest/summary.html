@@ -1,0 +1,126 @@
+{% extends 'suggest/suggest_base.html' %}
+
+{% block page_title %}
+Event summary | {{ super() }}
+{% endblock %}
+
+{% block site_css %}
+  {{ super() }}
+  {% compress css %}
+  <link href="{{ static('suggest/css/summary.css') }}" rel="stylesheet" type="text/css">
+  {% endcompress %}
+{% endblock %}
+
+{% block banner %}
+    {% include 'main/_banner_small.html' %}
+{% endblock %}
+
+{% block content_main %}
+  {% include 'suggest/_breadcrumb.html' %}
+  <h2 class="section-title">Event summary</h2>
+
+  <table>
+    {% if not event.submitted %}
+    <tr>
+      <td colspan="2" class="edit-link"><a href="{{ url('suggest:title', event.pk) }}">Change title</a></td>
+    </tr>
+    {% endif %}
+    <tr>
+      <th>Title</th>
+      <td>{{ event.title }}</td>
+    </tr>
+    <tr>
+      <th>Slug</th>
+      <td>{{ event.slug }}</td>
+    </tr>
+
+    {% if not event.submitted %}
+    <tr>
+      <td colspan="2" class="edit-link"><a href="{{ url('suggest:description', event.pk) }}">Change description</a></td>
+    </tr>
+    {% endif %}
+    <tr>
+      <th>Description</th>
+      <td>{{ event.description }}</td>
+    </tr>
+    <tr>
+      <th>Short description</th>
+      <td>{{ event.short_description }}</td>
+    </tr>
+    {% if not event.submitted %}
+    <tr>
+      <td colspan="2" class="edit-link"><a href="{{ url('suggest:details', event.pk) }}">Change details</a></td>
+    </tr>
+    {% endif %}
+    <tr>
+      <th>Location</th>
+      <td>{{ event.location }} ({{ event.location.timezone }})</td>
+    </tr>
+    <tr>
+      <th>Start time</th>
+      <td>{{ event.start_time|js_date }}</td>
+    </tr>
+    <tr>
+      <th>Privacy</th>
+      <td>{{ event.get_privacy_display() }}</td>
+    </tr>
+    <tr>
+      <th>Category</th>
+      <td>{{ event.category }}</td>
+    </tr>
+    <tr>
+      <th>Tags</th>
+      <td>{% for tag in event.tags.all() %}
+      {{ tag }}{% if not loop.last %}, {% endif %}
+      {% endfor %}
+      </td>
+    </tr>
+    <tr>
+      <th>Channels</th>
+      <td>{% for channel in event.channels.all() %}
+      {{ channel.name }}{% if not loop.last %}, {% endif %}
+      {% endfor %}
+      </td>
+    </tr>
+    <tr>
+      <th>Additional links</th>
+      <td>{{ event.additional_links }}</td>
+    </tr>
+
+    {% if not event.submitted %}
+    <tr>
+      <td colspan="2" class="edit-link"><a href="{{ url('suggest:placeholder', event.pk) }}">Change placeholder</a></td>
+    </tr>
+    {% endif %}
+    <tr>
+      <th>Placeholder picture</th>
+      <td>
+          {% set thumb = thumbnail(event.placeholder_img, '160x160', crop='center') %}
+          <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+               alt="{{ event.title }}" class="wp-post-image">
+      </td>
+    </tr>
+
+    {% if event.submitted %}
+    <tr>
+      <th>Submitted</th>
+      <td>{{ event.submitted|js_date }}</td>
+    </tr>
+    <tr>
+      <th>Comments</th>
+      <td>
+        {{ event.comments|urlize|nl2br }}
+      </td>
+    </tr>
+    {% endif %}
+  </table>
+
+
+  {% if not event.submitted %}
+  <div class="submission">
+    <h3>Is it ready?</h3>
+    <button type="submit" class="btn btn-primary submit" name="submit">Submit for review</button>
+  </div>
+  {% endif %}
+
+{% endblock %}

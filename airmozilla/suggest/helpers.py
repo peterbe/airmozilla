@@ -23,11 +23,11 @@ _STATES = [
         'view': 'suggest:placeholder',
         'description': 'No placeholder image',
     },
-    {
-        'not': [lambda event: event.participants.all().count()],
-        'view': 'suggest:participants',
-        'description': 'No participants selected'
-    },
+    #{
+    #    'not': [lambda event: event.participants.all().count()],
+    #    'view': 'suggest:participants',
+    #    'description': 'No participants selected'
+    #},
 ]
 
 _DEFAULT_STATE = {
@@ -71,3 +71,53 @@ def state_description(event):
     state = _get_state(event)
     assert state, event
     return state['description']
+
+
+@register.function
+def breadcrumbs(event):
+    state = _get_state(event)
+    links = []
+    # title
+    links.append({
+        'url': reverse('suggest:title', args=(event.pk,)),
+        'description': 'Title',
+        'available': True,
+    })
+
+    available = state['view'] != 'suggest:description'
+    # description
+    links.append({
+        'url': reverse('suggest:description', args=(event.pk,)),
+        'description': 'Description',
+        'available': available,
+    })
+
+    # details
+    if available:
+        available = state['view'] != 'suggest:details'
+    links.append({
+        'url': reverse('suggest:details', args=(event.pk,)),
+        'description': 'Details',
+        'available': available,
+    })
+
+    # placeholder
+    if available:
+        available = state['view'] != 'suggest:placeholder'
+    links.append({
+        'url': reverse('suggest:placeholder', args=(event.pk,)),
+        'description': 'Placeholder',
+        'available': available,
+    })
+
+    # summary
+    if available:
+        available = state['view'] != 'suggest:summary'
+    links.append({
+        'url': reverse('suggest:summary', args=(event.pk,)),
+        'description': 'Summary',
+        'available': available,
+    })
+    print [x['url'] for x in links]
+
+    return links

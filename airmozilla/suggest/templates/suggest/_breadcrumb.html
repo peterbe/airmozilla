@@ -1,0 +1,12 @@
+<p class="breadcrumb">
+{% for link in breadcrumbs(event) %}
+  {% if link.available %}
+    <a href="{{ link.url }}">{{ link.description }}</a>
+  {% else %}
+    {{ link.description }}
+  {% endif %}
+  {% if not loop.last %}
+    &rarr;
+  {% endif %}
+{% endfor %}
+</p>

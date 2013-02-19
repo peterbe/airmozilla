@@ -7,12 +7,32 @@ from airmozilla.main.models import (
     SuggestedEvent,
     Event,
     Tag,
-    Participant,
     Channel
 )
 
 
 class StartForm(BaseModelForm):
+
+    class Meta:
+        model = SuggestedEvent
+        fields = ('title',)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(StartForm, self).__init__(*args, **kwargs)
+
+    def clean_title(self):
+        value = self.cleaned_data['title']
+        if Event.objects.filter(title__iexact=value):
+            raise forms.ValidationError("Event title already used")
+        if SuggestedEvent.objects.filter(title__iexact=value, user=self.user):
+            raise forms.ValidationError(
+                "You already have a suggest event with this title"
+            )
+        return value
+
+
+class TitleForm(BaseModelForm):
 
     class Meta:
         model = SuggestedEvent
@@ -25,8 +45,14 @@ class StartForm(BaseModelForm):
                 raise forms.ValidationError('Already taken')
         return value
 
+    def clean_title(self):
+        value = self.cleaned_data['title']
+        if Event.objects.filter(title__iexact=value):
+            raise forms.ValidationError("Event title already used")
+        return value
+
     def clean(self):
-        cleaned_data = super(StartForm, self).clean()
+        cleaned_data = super(TitleForm, self).clean()
         if 'slug' in cleaned_data and 'title' in cleaned_data:
             if not cleaned_data['slug']:
                 cleaned_data['slug'] = slugify(cleaned_data['title'])
@@ -74,7 +100,9 @@ class DetailsForm(BaseModelForm):
     def clean_channels(self):
         channels = self.cleaned_data['channels']
         if not channels:
-            channels.append(Channel.objects.get(slug=settings.DEFAULT_CHANNEL_SLUG))
+            channels.append(
+                Channel.objects.get(slug=settings.DEFAULT_CHANNEL_SLUG)
+            )
         return channels
 
 
@@ -85,20 +113,21 @@ class PlaceholderForm(BaseModelForm):
         fields = ('placeholder_img',)
 
 
-class ParticipantsForm(BaseModelForm):
-
-    participants = forms.CharField(required=False)
-
-    class Meta:
-        model = SuggestedEvent
-        fields = ('participants',)
-
-    def clean_participants(self):
-        participants = self.cleaned_data['participants']
-        split_participants = [p.strip() for p in participants.split(',')
-                              if p.strip()]
-        final_participants = []
-        for participant_name in split_participants:
-            p = Participant.objects.get(name=participant_name)
-            final_participants.append(p)
-        return final_participants
+#class ParticipantsForm(BaseModelForm):
+#
+#    participants = forms.CharField(required=False)
+#
+#    class Meta:
+#        model = SuggestedEvent
+#        fields = ('participants',)
+#
+#    def clean_participants(self):
+#        participants = self.cleaned_data['participants']
+#        split_participants = [p.strip() for p in participants.split(',')
+#                              if p.strip()]
+#        final_participants = []
+#        for participant_name in split_participants:
+#            p = Participant.objects.get(name=participant_name)
+#            final_participants.append(p)
+#        return final_participants
+#

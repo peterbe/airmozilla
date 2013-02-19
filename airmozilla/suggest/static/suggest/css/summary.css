@@ -1,0 +1,14 @@
+td.edit-link {
+    text-align: right;
+}
+
+th {
+    text-align: left;
+    vertical-align: top;
+}
+
+div.submission {
+    padding: 10px;
+    border: 1px solid rgb(30,30,30);
+    text-align: center;
+}

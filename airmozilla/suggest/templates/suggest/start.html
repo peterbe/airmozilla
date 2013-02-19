@@ -9,6 +9,10 @@ Suggest a new event | {{ super() }}
     {% include 'main/_banner_small.html' %}
 {% endblock %}
 
+{% block breadcrumb %}
+   {# deliberately empty #}
+{% endblock %}
+
 {% block content_main %}
 
 {% for event in suggestions %}
