@@ -1,0 +1,17 @@
+.delete-confirm-question,
+button.delete-confirm,
+button.delete-cancel {
+    display: none;
+
+}
+
+button.delete-button,
+button.delete-confirm,
+button.delete-cancel {
+    font-size: 80%;
+    padding: 4px 12px;
+}
+
+td.delete {
+    text-align: right;
+}

@@ -77,6 +77,13 @@ def state_description(event):
 def breadcrumbs(event):
     state = _get_state(event)
     links = []
+    # start
+    links.append({
+        'url': reverse('suggest:start'),
+        'description': 'Start',
+        'available': True,
+    })
+
     # title
     links.append({
         'url': reverse('suggest:title', args=(event.pk,)),
@@ -118,6 +125,5 @@ def breadcrumbs(event):
         'description': 'Summary',
         'available': available,
     })
-    print [x['url'] for x in links]
 
     return links

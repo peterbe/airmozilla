@@ -13,16 +13,32 @@ Suggest a new event | {{ super() }}
    {# deliberately empty #}
 {% endblock %}
 
+{% block site_css %}
+  {{ super() }}
+  {% compress css %}
+  <link href="{{ static('suggest/css/start.css') }}" rel="stylesheet" type="text/css">
+  {% endcompress %}
+{% endblock %}
+
+{% block site_js %}
+  {{ super() }}
+  {% compress js %}
+    <script src="{{ static('suggest/js/start.js') }}"></script>
+  {% endcompress %}
+{% endblock %}
+
+
 {% block content_main %}
 
 {% for event in suggestions %}
   {% if loop.first %}
   <h2 class="section-title">Incomplete event suggestions</h2>
-  <table>
+  <table style="width:100%">
     <thead>
       <tr>
         <th>Event title</th>
         <th>Status</th>
+        <th>&nbsp;</th>
       </tr>
     </thead>
     <tbody>
@@ -34,6 +50,12 @@ Suggest a new event | {{ super() }}
     </td>
     <td>
       {{ state_description(event) }}
+    </td>
+    <td class="delete" data-id="{{ event.pk }}">
+      <button class="delete-button">Delete</button>
+      <span class="delete-confirm-question">Are you sure?</span>
+      <button class="delete-confirm">Yes</button>
+      <button class="delete-cancel">No</button>
     </td>
   </tr>
 

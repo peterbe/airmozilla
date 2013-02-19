@@ -12,4 +12,5 @@ urlpatterns = patterns(
     #url(r'^(?P<id>\d+)/participants/$', views.participants,
     #    name='participants'),
     url(r'^(?P<id>\d+)/summary/$', views.summary, name='summary'),
+    url(r'^(?P<id>\d+)/delete/$', views.delete, name='delete'),
 )

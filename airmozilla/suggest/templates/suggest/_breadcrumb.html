@@ -1,5 +1,6 @@
-<p class="breadcrumb">
+<p class="breadcrumb" style="text-align: justify">
 {% for link in breadcrumbs(event) %}
+  <span class="node {% if link.url == request.path_info %}currently-on{% endif %}">
   {% if link.available %}
     <a href="{{ link.url }}">{{ link.description }}</a>
   {% else %}
@@ -8,5 +9,6 @@
   {% if not loop.last %}
     &rarr;
   {% endif %}
+  </span>
 {% endfor %}
 </p>

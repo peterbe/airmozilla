@@ -3,6 +3,8 @@ from django import http
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 from funfactory.urlresolvers import reverse
 from airmozilla.main.models import SuggestedEvent, Event
@@ -166,3 +168,14 @@ def summary(request, id):
         return http.HttpResponseBadRequest('Not your event')
 
     return render(request, 'suggest/summary.html', {'event': event})
+
+
+@csrf_exempt
+@require_POST
+@login_required
+def delete(request, id):
+    event = get_object_or_404(SuggestedEvent, pk=id)
+    if event.user != request.user:
+        return http.HttpResponseBadRequest('Not your event')
+    event.delete()
+    return redirect('suggest:start')
