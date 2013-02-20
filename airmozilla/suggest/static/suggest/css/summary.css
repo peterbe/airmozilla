@@ -7,8 +7,14 @@ th {
     vertical-align: top;
 }
 
-div.submission {
+form.submission {
     padding: 10px;
-    border: 1px solid rgb(30,30,30);
+    border: 4px solid rgb(50,50,50);
     text-align: center;
+}
+
+form.unsubmission {
+    padding: 20px;
+    margin: 20px;
+    border: 4px solid rgb(50,50,50);
 }

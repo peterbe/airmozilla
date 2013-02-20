@@ -2,9 +2,16 @@ import datetime
 from django import http
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Permission
 from django.template.defaultfilters import slugify
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import utc
+from django.db import transaction
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.contrib.sites.models import RequestSite
 
 from funfactory.urlresolvers import reverse
 from airmozilla.main.models import SuggestedEvent, Event
@@ -27,6 +34,7 @@ def _increment_slug_if_exists(slug):
 
 
 @login_required
+@transaction.commit_on_success
 def start(request):
     data = {}
     if request.method == 'POST':
@@ -51,11 +59,13 @@ def start(request):
             .order_by('modified')
         )
     data['form'] = form
+    data['event'] = None
 
     return render(request, 'suggest/start.html', data)
 
 
 @login_required
+@transaction.commit_on_success
 def title(request, id):
     event = get_object_or_404(SuggestedEvent, pk=id)
     if event.user != request.user:
@@ -76,6 +86,7 @@ def title(request, id):
 
 
 @login_required
+@transaction.commit_on_success
 def description(request, id):
     event = get_object_or_404(SuggestedEvent, pk=id)
     if event.user != request.user:
@@ -96,6 +107,7 @@ def description(request, id):
 
 
 @login_required
+@transaction.commit_on_success
 def details(request, id):
     event = get_object_or_404(SuggestedEvent, pk=id)
     if event.user != request.user:
@@ -118,6 +130,7 @@ def details(request, id):
 
 
 @login_required
+@transaction.commit_on_success
 def placeholder(request, id):
     event = get_object_or_404(SuggestedEvent, pk=id)
     if event.user != request.user:
@@ -141,33 +154,60 @@ def placeholder(request, id):
     return render(request, 'suggest/placeholder.html', data)
 
 
-#@login_required
-#def participants(request, id):
-#    event = get_object_or_404(SuggestedEvent, pk=id)
-#    if event.user != request.user:
-#        return http.HttpResponseBadRequest('Not your event')
-#
-#    form_class = forms.ParticipantsForm
-#    if request.method == 'POST':
-#        form = form_class(request.POST, instance=event)
-#        if form.is_valid():
-#            event = form.save()
-#            form.save_m2m()
-#            url = reverse('suggest:submit', args=(event.pk,))
-#            return redirect(url)
-#    else:
-#        form = form_class(instance=event)
-#
-#    return render(request, 'suggest/participants.html', {'form': form})
-
-
 @login_required
+@transaction.commit_on_success
 def summary(request, id):
     event = get_object_or_404(SuggestedEvent, pk=id)
     if event.user != request.user:
-        return http.HttpResponseBadRequest('Not your event')
+        # it's ok if it's submitted and you have the 'add_event'
+        # permission
+        if request.user.has_perm('add_event'):
+            if not event.submitted:
+                return http.HttpResponseBadRequest('Not submitted')
+        else:
+            return http.HttpResponseBadRequest('Not your event')
+
+    if request.method == 'POST':
+        if event.submitted:
+            event.submitted = None
+            event.save()
+        else:
+            now = datetime.datetime.utcnow().replace(tzinfo=utc)
+            event.submitted = now
+            event.save()
+            _email_about_suggested_event(event, request)
+        url = reverse('suggest:summary', args=(event.pk,))
+        return redirect(url)
 
     return render(request, 'suggest/summary.html', {'event': event})
+
+
+def _email_about_suggested_event(event, request):
+    permission = Permission.objects.get(codename='add_event')
+    emails = set()
+    for group in permission.group_set.all():
+        emails.update([u.email for u in group.user_set.all()])
+    subject = (
+        '[Air Mozilla] New suggested event: %s' % event.title
+    )
+    base_url = (
+        '%s://%s' % (request.is_secure() and 'https' or 'http',
+                     RequestSite(request).domain)
+    )
+    message = render_to_string(
+        'suggest/_email_submitted.html',
+        {
+            'event': event,
+            'base_url': base_url,
+        }
+    )
+    email = EmailMessage(
+        subject,
+        message,
+        settings.EMAIL_FROM_ADDRESS,
+        emails
+    )
+    email.send()
 
 
 @csrf_exempt

@@ -119,7 +119,7 @@ def breadcrumbs(event):
 
     # summary
     if available:
-        available = state['view'] != 'suggest:summary'
+        available = state['view'] == 'suggest:summary'
     links.append({
         'url': reverse('suggest:summary', args=(event.pk,)),
         'description': 'Summary',

@@ -348,10 +348,6 @@ def event_edit(request, id):
     if request.method == 'POST':
         form = form_class(request.POST, request.FILES, instance=event)
         if form.is_valid():
-            print "MANAGE"
-            print request.POST.get('tags')
-            print form.cleaned_data['tags']
-
             event = form.save(commit=False)
             _event_process(request, form, event)
             event.save()
@@ -1013,3 +1009,10 @@ def vidly_url_to_shortcode(request, id):
         else:
             return HttpResponseBadRequest(error)
     return HttpResponseBadRequest(str(form.errors))
+
+
+@staff_required
+@permission_required('main.add_event')
+def suggestions(request):
+    data = {}
+    return render(request, 'manage/suggestions.html', data)

@@ -19,6 +19,22 @@ Event summary | {{ super() }}
   {% include 'suggest/_breadcrumb.html' %}
   <h2 class="section-title">Event summary</h2>
 
+  {% if event.submitted %}
+  <form action="" method="post" class="unsubmission">{{ csrf() }}
+    <h3>Submitted!</h3>
+    <p>This was submitted by <strong>{{ event.user.email }}</strong>
+    <strong>{{ event.submitted|js_date }}</strong>.</p>
+
+    {% if request.user == event.user %}
+    <p>Now you can wait for it to be turned into a scheduled event or to receive
+    comments about the submission.</p>
+    <button type="submit" class="btn btn-primary submit" name="unsubmit">Retract submission</button>
+    {% else %}
+    <p><a href="{{ url('manage:suggestions') }}#s{{ event.pk }}">Suggestions Management &raquo;</a></p>
+    {% endif %}
+  </form>
+  {% endif %}
+
   <table>
     {% if not event.submitted %}
     <tr>
@@ -41,11 +57,11 @@ Event summary | {{ super() }}
     {% endif %}
     <tr>
       <th>Description</th>
-      <td>{{ event.description }}</td>
+      <td>{{ event.description|urlize|nl2br }}</td>
     </tr>
     <tr>
       <th>Short description</th>
-      <td>{{ event.short_description }}</td>
+      <td>{{ event.short_description|urlize|nl2br }}</td>
     </tr>
     {% if not event.submitted %}
     <tr>
@@ -117,10 +133,10 @@ Event summary | {{ super() }}
 
 
   {% if not event.submitted %}
-  <div class="submission">
+  <form action="" method="post" class="submission">{{ csrf() }}
     <h3>Is it ready?</h3>
     <button type="submit" class="btn btn-primary submit" name="submit">Submit for review</button>
-  </div>
+  </form>
   {% endif %}
 
 {% endblock %}

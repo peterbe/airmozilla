@@ -2,5 +2,8 @@
 <form method="post" class="form-horizontal">
     {{ csrf() }}
     {{ bootstrapform(form) }}
+
+    {% if event and not event.submitted %}
     {% include 'suggest/_form_buttons.html' %}
+    {% endif %}
 </form>
