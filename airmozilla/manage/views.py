@@ -38,7 +38,8 @@ from airmozilla.main.models import (
     Participant,
     Tag,
     Template,
-    Channel
+    Channel,
+    SuggestedEvent
 )
 from airmozilla.manage import forms
 
@@ -889,7 +890,7 @@ def approvals(request):
 @transaction.commit_on_success
 def approval_review(request, id):
     """Approve/deny an event on behalf of a group."""
-    approval = Approval.objects.get(id=id)
+    approval = get_object_or_404(Approval, id=id)
     if approval.group not in request.user.groups.all():
         return redirect('manage:approvals')
     if request.method == 'POST':
@@ -1015,4 +1016,46 @@ def vidly_url_to_shortcode(request, id):
 @permission_required('main.add_event')
 def suggestions(request):
     data = {}
+    events = (
+        SuggestedEvent.objects
+        .filter(accepted=None)
+        .exclude(submitted=None)
+        .order_by('submitted')
+    )
+    data['events'] = events
     return render(request, 'manage/suggestions.html', data)
+
+
+@staff_required
+@permission_required('main.add_event')
+@transaction.commit_on_success
+def suggestion_review(request, id):
+    event = get_object_or_404(SuggestedEvent, pk=id)
+    if request.method == 'POST':
+        form = forms.AcceptSuggestedEventForm(
+            request.POST,
+            instance=event,
+        )
+        reject = request.POST.get('reject')
+        if reject:
+            form.fields['review_comments'].required = True
+
+        if form.is_valid():
+            form.save()
+            if reject:
+                event.submitted = None
+                event.save()
+                _email_about_rejected_suggestion(event, request)
+            else:
+                event.accepted = real
+                event.save()
+                _email_about_accepted_suggestion(event, real, request)
+            url = reverse('manage:suggestions')
+            return redirect(url)
+    else:
+        form = forms.AcceptSuggestedEventForm(instance=event)
+    data = {
+        'event': event,
+        'form': form,
+    }
+    return render(request, 'manage/suggestion_review.html', data)

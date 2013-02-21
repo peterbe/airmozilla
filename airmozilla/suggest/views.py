@@ -161,7 +161,7 @@ def summary(request, id):
     if event.user != request.user:
         # it's ok if it's submitted and you have the 'add_event'
         # permission
-        if request.user.has_perm('add_event'):
+        if request.user.has_perm('main.add_event'):
             if not event.submitted:
                 return http.HttpResponseBadRequest('Not submitted')
         else:
