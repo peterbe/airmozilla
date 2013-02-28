@@ -1,3 +1,4 @@
+import os
 import re
 import cgi
 import datetime
@@ -25,7 +26,9 @@ from airmozilla.main.models import (
     Location,
     Participant,
     Template,
-    Channel
+    Channel,
+    Tag,
+    SuggestedEvent
 )
 
 
@@ -1303,3 +1306,75 @@ class TestErrorAlerts(ManageTestCase):
             'content': 'hello!'
         })
         ok_('Form errors!' in response.content)
+
+
+class TestSuggestions(ManageTestCase):
+
+    placeholder = 'airmozilla/manage/tests/firefox.png'
+
+    def test_approve_suggested_event_basic(self):
+        bob = User.objects.create_user('bob')
+        location = Location.objects.get(id=1)
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        tomorrow = now + datetime.timedelta(days=1)
+        category = Category.objects.create(name='CATEGORY')
+        tag1 = Tag.objects.create(name='TAG1')
+        tag2 = Tag.objects.create(name='TAG2')
+        channel = Channel.objects.create(name='CHANNEL')
+
+        # create a suggested event that has everything filled in
+        event = SuggestedEvent.objects.create(
+            user=bob,
+            title='TITLE',
+            slug='SLUG',
+            short_description='SHORT DESCRIPTION',
+            description='DESCRIPTION',
+            start_time=tomorrow,
+            location=location,
+            category=category,
+            placeholder_img=self.placeholder,
+            privacy=Event.PRIVACY_CONTRIBUTORS,
+            #call_info='CALL INFO',
+            #additional_links='ADDITIONAL LINKS',
+            submitted=now,
+        )
+        event.tags.add(tag1)
+        event.tags.add(tag2)
+        event.channels.add(channel)
+
+        url = reverse('manage:suggestion_review', args=(event.pk,))
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        ok_('TITLE' in response.content)
+        ok_('SLUG' in response.content)
+        ok_('SHORT DESCRIPTION' in response.content)
+        ok_('DESCRIPTION' in response.content)
+        ok_(os.path.basename(self.placeholder) in response.content)
+        ok_(category.name in response.content)
+        ok_(location.name in response.content)
+        ok_(event.get_privacy_display() in response.content)
+        #ok_('CALL INFO' in response.content
+        #ok_('ADDITIONAL LINKS' in response.content)
+
+        response = self.client.post(url)
+        eq_(response.status_code, 302)
+
+        # re-load it
+        event = SuggestedEvent.objects.get(pk=event.pk)
+        real = event.accepted
+        assert real
+        eq_(real.title, event.title)
+        eq_(real.slug, event.slug)
+        eq_(real.short_description, event.short_description)
+        eq_(real.description, event.description)
+        eq_(real.placeholder_img, event.placeholder_img)
+        eq_(real.category, category)
+        eq_(real.location, location)
+        eq_(real.start_time, event.start_time)
+        eq_(real.privacy, event.privacy)
+        assert real.tags.all()
+        eq_([x.name for x in real.tags.all()],
+            [x.name for x in event.tags.all()])
+        assert real.channels.all()
+        eq_([x.name for x in real.channels.all()],
+            [x.name for x in event.channels.all()])

@@ -14,9 +14,9 @@
     ('Short description', event.short_description),
     ('Start time', event.start_time|js_date),
     ('Location', event.location),
+    ('Privacy', event.get_privacy_display()),
     ('Category', event.category),
     ('Additional links', event.additional_links),
-    ('Privacy', event.get_privacy_display()),
     ('Creator', event.user.email),
     ('Submitted', event.submitted|js_date),
   ] -%}
@@ -44,6 +44,9 @@
         </td>
       </tr>
   </table>
+  {% if real_event_form %}
+  {{ real_event_form.errors }}
+  {% endif %}
   <form method="post" class="form-horizontal">
   {{ csrf() }}
   {{ bootstrapform(form) }}
@@ -53,10 +56,10 @@
       <i class="icon-ok"></i>
       Approve
     </button>
-    <button type="submit" class="btn btn-danger btn-large"
+    <button type="submit" class="btn btn-danger btn-large" title="Saying 'Reject' is too harsh"
             name="reject" value="reject" id="submit_reject">
       <i class="icon-remove"></i>
-      Reject
+      Bounce back
     </button>
   </div>
   </form>

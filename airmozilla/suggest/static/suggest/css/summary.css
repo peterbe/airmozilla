@@ -18,3 +18,8 @@ form.unsubmission {
     margin: 20px;
     border: 4px solid rgb(50,50,50);
 }
+
+
+.main table {
+    width: 100%;
+}

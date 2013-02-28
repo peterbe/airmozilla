@@ -4,6 +4,11 @@ from funfactory.urlresolvers import reverse
 
 _STATES = [
     {
+        'required': ['accepted'],
+        'view': 'suggest:summary',
+        'description': 'Accepted'
+    },
+    {
         'required': ['submitted'],
         'view': 'suggest:summary',
         'description': 'Submitted'

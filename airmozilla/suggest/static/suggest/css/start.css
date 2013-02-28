@@ -15,3 +15,10 @@ button.delete-cancel {
 td.delete {
     text-align: right;
 }
+
+table.suggestions {
+    width: 100%;
+}
+table.suggestions th {
+    text-align: left;
+}

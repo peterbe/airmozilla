@@ -122,13 +122,13 @@ Event summary | {{ super() }}
       <th>Submitted</th>
       <td>{{ event.submitted|js_date }}</td>
     </tr>
+    {% endif %}
     <tr>
-      <th>Comments</th>
+      <th>Review comments</th>
       <td>
-        {{ event.comments|urlize|nl2br }}
+        {{ event.review_comments|urlize|nl2br }}
       </td>
     </tr>
-    {% endif %}
   </table>
 
 

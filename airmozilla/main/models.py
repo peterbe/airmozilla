@@ -292,6 +292,15 @@ class Event(models.Model):
     def is_public(self):
         return self.privacy == self.PRIVACY_PUBLIC
 
+    def needs_approval(self):
+        if self.status == self.STATUS_SCHEDULED:
+            for approval in Approval.objects.filter(event=self):
+                if approval.processed:
+                    return False
+                if not approval.approved:
+                    return True
+        return False
+
 
 class SuggestedEvent(models.Model):
     user = models.ForeignKey(User)

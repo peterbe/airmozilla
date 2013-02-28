@@ -33,7 +33,7 @@ Suggest a new event | {{ super() }}
 {% for event in suggestions %}
   {% if loop.first %}
   <h2 class="section-title">Incomplete event suggestions</h2>
-  <table style="width:100%">
+  <table class="suggestions">
     <thead>
       <tr>
         <th>Event title</th>
@@ -52,10 +52,24 @@ Suggest a new event | {{ super() }}
       {{ state_description(event) }}
     </td>
     <td class="delete" data-id="{{ event.pk }}">
+      {% if event.accepted %}
+        {% if event.accepted.status == Event.STATUS_INITIATED %}
+          not yet scheduled
+        {% elif event.accepted.status == Event.STATUS_SCHEDULED %}
+          {% if event.accepted.needs_approval() %}
+          accepted but pending approval
+          {% else %}
+          <a href="{{ url('main:event', event.accepted.slug) }}">accepted and scheduled</a>
+          {% endif %}
+        {% elif event.accepted.status == Event.STATUS_REMOVED %}
+          accepted but removed
+        {% endif %}
+      {% else %}
       <button class="delete-button">Delete</button>
       <span class="delete-confirm-question">Are you sure?</span>
       <button class="delete-confirm">Yes</button>
       <button class="delete-cancel">No</button>
+      {% endif %}
     </td>
   </tr>
 
