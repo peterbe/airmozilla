@@ -19,7 +19,25 @@ Event summary | {{ super() }}
   {% include 'suggest/_breadcrumb.html' %}
   <h2 class="section-title">Event summary</h2>
 
-  {% if event.submitted %}
+  {% if event.accepted %}
+  <div class="accepted">
+    <h3>Accepted!</h3>
+    <p>
+        {% if event.accepted.status == Event.STATUS_INITIATED %}
+          This event has been accepted but not yet scheduled.
+        {% elif event.accepted.status == Event.STATUS_SCHEDULED %}
+          {% if event.accepted.needs_approval() %}
+          This event has been accepted but is pending approval.
+          {% else %}
+          This event is
+	  <a href="{{ url('main:event', event.accepted.slug) }}">accepted and scheduled</a>.
+          {% endif %}
+        {% elif event.accepted.status == Event.STATUS_REMOVED %}
+          This event was accepted but was later removed.
+        {% endif %}
+    </p>
+  </div>
+  {% elif event.submitted %}
   <form action="" method="post" class="unsubmission">{{ csrf() }}
     <h3>Submitted!</h3>
     <p>This was submitted by <strong>{{ event.user.email }}</strong>
