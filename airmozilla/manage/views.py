@@ -1057,6 +1057,13 @@ def suggestion_review(request, id):
                 event.submitted = None
                 event.save()
                 _email_about_rejected_suggestion(event, request)
+                messages.info(
+                    request,
+                    'Suggested event bounced back and %s has been emailed'
+                    % (event.user.email,)
+                )
+                url = reverse('manage:suggestions')
+                return redirect(url)
             else:
                 dict_event = {
                     'title': event.title,

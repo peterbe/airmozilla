@@ -116,9 +116,10 @@ def details(request, id):
     if request.method == 'POST':
         form = forms.DetailsForm(request.POST, instance=event)
         if form.is_valid():
-            event = form.save(commit=False)
-            event.save()
-            form.save_m2m()
+            event = form.save()
+            #print form.cleaned_data
+            #event.save()
+            #form.save_m2m()
             # XXX use next_url() instead?
             url = reverse('suggest:placeholder', args=(event.pk,))
             return redirect(url)

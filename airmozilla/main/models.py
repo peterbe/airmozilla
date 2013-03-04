@@ -341,6 +341,9 @@ class SuggestedEvent(models.Model):
 
     objects = EventManager()
 
+    def __unicode__(self):
+        return self.title
+
 
 class EventOldSlug(models.Model):
     """Used to permanently redirect old URLs to the new slug location."""
