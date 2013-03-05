@@ -1,4 +1,5 @@
-form.suggest input {
+form.suggest input,
+form.suggest textarea {
     width: 100%;
 }
 
@@ -9,4 +10,12 @@ form.suggest input {
 
 form .control-group {
     margin-top: 10px;
+}
+
+textarea#id_short_description {
+    height: 100px;
+}
+
+#id_start_time {
+    width: 200px;
 }
