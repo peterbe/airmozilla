@@ -1,6 +1,14 @@
 {% extends 'main/main_base.html' %}
 {% set page='suggest' %}
 
+{% block site_css %}
+  {{ super() }}
+  {% compress css %}
+  <link href="{{ static('suggest/css/suggest.css') }}" rel="stylesheet" type="text/css">
+  {% endcompress %}
+{% endblock %}
+
+
 {% block banner %}
     {% include 'main/_banner_small.html' %}
 {% endblock %}

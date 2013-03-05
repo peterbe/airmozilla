@@ -22,3 +22,8 @@ table.suggestions {
 table.suggestions th {
     text-align: left;
 }
+
+.start-tooltip {
+    display: none;
+    margin-top: 15px;
+}

@@ -31,4 +31,12 @@ $(function() {
         reset_buttons();
         return false;
     });
+
+    $('#id_title').on('focus', function() {
+        $('.start-tooltip:hidden').fadeIn(900);
+    }).on('blur', function() {
+        if (!$(this).val()) {
+            $('.start-tooltip:visible').fadeOut(600);
+        }
+    });
 });

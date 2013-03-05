@@ -1,0 +1,12 @@
+form.suggest input {
+    width: 100%;
+}
+
+.form-actions {
+    float: right;
+    margin-top: 10px;
+}
+
+form .control-group {
+    margin-top: 10px;
+}

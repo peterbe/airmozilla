@@ -23,7 +23,7 @@ Suggest a new event | {{ super() }}
 {% block site_js %}
   {{ super() }}
   {% compress js %}
-    <script src="{{ static('suggest/js/start.js') }}"></script>
+  <script src="{{ static('suggest/js/start.js') }}"></script>
   {% endcompress %}
 {% endblock %}
 
@@ -85,5 +85,10 @@ Suggest a new event | {{ super() }}
   <h3 class="section-sub-title">What are you going to call it?</h3>
 
   {% include 'suggest/_default_form.html' %}
+
+  <p class="start-tooltip">
+  Once you've picked a suitable title you'll proceed to fill in
+  all the other various details about your suggested event.
+  </p>
 
 {% endblock %}

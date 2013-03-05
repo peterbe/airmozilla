@@ -67,6 +67,12 @@ class DescriptionForm(BaseModelForm):
         model = SuggestedEvent
         fields = ('description', 'short_description')
 
+    def __init__(self, *args, **kwargs):
+        super(DescriptionForm, self).__init__(*args, **kwargs)
+        self.fields['description'].help_text = (
+            "Richard! Can you think of a more appropriate text here?"
+        )
+
 
 class DetailsForm(BaseModelForm):
 
