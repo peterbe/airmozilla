@@ -12,9 +12,7 @@ Event details | {{ super() }}
   {{ super() }}
   {% compress css %}
   <link href="{{ static('suggest/select2/select2.css') }}" rel="stylesheet" type="text/css">
-  <!-- XXX move these to base -->
-  <!--<link href="{{ static('manage/css/select2.css') }}" rel="stylesheet" type="text/css">-->
-  <link href="{{ static('manage/css/jquery-ui-1.8.21.custom.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ static('suggest/jquery-ui/css/smoothness/jquery-ui-1.10.1.custom.min.css') }}" rel="stylesheet" type="text/css">
   {% endcompress %}
 {% endblock %}
 
@@ -22,9 +20,8 @@ Event details | {{ super() }}
   {{ super() }}
   {% compress js %}
     <script src="{{ static('suggest/select2/select2.min.js') }}"></script>
-    <!-- XXX move these to base -->
-    <script src="{{ static('manage/js/jquery-ui-1.8.21.custom.min.js') }}"></script>
-    <script src="{{ static('manage/js/jquery-ui-timepicker-addon.js') }}"></script>
+    <script src="{{ static('suggest/jquery-ui/js/jquery-ui-1.10.1.custom.min.js') }}"></script>
+    <script src="{{ static('suggest/js/jquery-ui-timepicker-addon.js') }}"></script>
     <script src="{{ static('suggest/js/details.js') }}"></script>
   {% endcompress %}
 {% endblock %}

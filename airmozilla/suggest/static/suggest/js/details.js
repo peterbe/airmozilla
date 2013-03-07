@@ -2,12 +2,12 @@
 $(function() {
     'use strict';
 
-    var process_tags = function process_tags(element) {
+    var process_tags = function process_tags(element, callback) {
         var data = [];
         $(element.val().split(',')).each(function () {
             data.push({id: this, text: this});
         });
-        return data;
+        callback(data);
     };
     // Autocomplete tags - uses the select2 library
     $('#id_tags').select2({
@@ -30,7 +30,7 @@ $(function() {
         stepHour: 1,
         stepMinute: 15,
         dateFormat: 'yy-mm-dd',
-        timeFormat: 'hh:mm'
+        timeFormat: 'HH:mm'
     });
 
     // Fill in the timezone from the selected location

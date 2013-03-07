@@ -93,6 +93,14 @@ class DetailsForm(BaseModelForm):
     def __init__(self, *args, **kwargs):
         super(DetailsForm, self).__init__(*args, **kwargs)
         self.fields['channels'].required = False
+        self.fields['location'].required = True
+        self.fields['start_time'].required = True
+        if 'instance' in kwargs:
+            event = kwargs['instance']
+            if event.pk:
+                tag_format = lambda objects: ','.join(map(unicode, objects))
+                tags_formatted = tag_format(event.tags.all())
+                self.initial['tags'] = tags_formatted
 
     def clean_tags(self):
         tags = self.cleaned_data['tags']

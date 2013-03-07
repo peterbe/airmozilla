@@ -92,7 +92,7 @@ Event summary | {{ super() }}
     </tr>
     <tr>
       <th>Start time</th>
-      <td>{{ event.start_time|js_date }}</td>
+      <td>{{ event.location_time.strftime('%d %B %Y - %H:%M') }}  ({{ event.start_time|js_date }})</td>
     </tr>
     <tr>
       <th>Privacy</th>
@@ -118,7 +118,7 @@ Event summary | {{ super() }}
     </tr>
     <tr>
       <th>Additional links</th>
-      <td>{{ event.additional_links }}</td>
+      <td>{{ event.additional_links|urlize|nl2br }}</td>
     </tr>
 
     {% if not event.submitted %}
@@ -129,9 +129,11 @@ Event summary | {{ super() }}
     <tr>
       <th>Placeholder picture</th>
       <td>
+          {% if event.placeholder_img %}
           {% set thumb = thumbnail(event.placeholder_img, '160x160', crop='center') %}
           <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
                alt="{{ event.title }}" class="wp-post-image">
+          {% endif %}
       </td>
     </tr>
 

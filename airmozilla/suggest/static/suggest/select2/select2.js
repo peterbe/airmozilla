@@ -274,7 +274,9 @@ the specific language governing permissions and limitations under the Apache Lic
             sizer.attr("class","select2-sizer");
         	$("body").append(sizer);
         }
+        console.log('e.val()', e.val());
         sizer.text(e.val());
+        console.log('sizer.width()', sizer.width());
         return sizer.width();
     }
 
@@ -1030,6 +1032,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 left: dropLeft,
                 width: width
             }, evaluate(this.opts.dropdownCss));
+            console.log('css', css);
 
             this.dropdown.css(css);
         },

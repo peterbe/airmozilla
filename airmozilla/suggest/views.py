@@ -117,7 +117,7 @@ def details(request, id):
         form = forms.DetailsForm(request.POST, instance=event)
         if form.is_valid():
             event = form.save()
-            #print form.cleaned_data
+            #print "\t", form.cleaned_data
             #event.save()
             #form.save_m2m()
             # XXX use next_url() instead?
@@ -180,6 +180,7 @@ def summary(request, id):
         url = reverse('suggest:summary', args=(event.pk,))
         return redirect(url)
 
+    event.location_time = event.start_time
     return render(request, 'suggest/summary.html', {'event': event})
 
 
@@ -202,6 +203,7 @@ def _email_about_suggested_event(event, request):
             'base_url': base_url,
         }
     )
+    assert emails
     email = EmailMessage(
         subject,
         message,
