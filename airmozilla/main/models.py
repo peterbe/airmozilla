@@ -364,6 +364,28 @@ class EventOldSlug(models.Model):
         return "%r -> %r" % (self.slug, self.event.slug)
 
 
+class EventTweet(models.Model):
+    """Used for prepareing a tweet and possibly sending it later."""
+    event = models.ForeignKey(Event, db_index=True)
+    text = models.CharField(max_length=140)
+    include_placeholder = models.BooleanField(default=False)
+    creator = models.ForeignKey(User, blank=True, null=True,
+                                on_delete=models.SET_NULL)
+    # when to send it
+    send_date = models.DateTimeField(blank=True, null=True)
+    send_after_approval = models.BooleanField(default=False)
+    # when it was sent
+    sent_date = models.DateTimeField(blank=True, null=True)
+    error = models.TextField(blank=True, null=True)
+    tweet_id = models.CharField(max_length=20, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.text
+
+    def __repr__(self):
+        return "<%s: %r>" % (self.__class__.__name__, self.text)
+
+
 class Approval(models.Model):
     """Sign events with approvals from appropriate user groups to log and
        designate that an event can be published."""
