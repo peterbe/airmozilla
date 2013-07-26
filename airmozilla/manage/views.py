@@ -619,6 +619,7 @@ def all_event_tweets(request):
     data = {
         'paginate': paged,
     }
+
     return render(request, 'manage/all_event_tweets.html', data)
 
 
@@ -1930,13 +1931,15 @@ def cron_pings(request):  # pragma: no cover
 @staff_required
 @permission_required('main.add_event')
 def event_hit_stats(request):
+    hits_per_day_sql = (
+        'total_hits / extract(days from (now() - main_event.archive_time))'
+    )
     stats = (
         EventHitStats.objects
         .exclude(event__archive_time__isnull=True)
         .order_by('-total_hits')
         .extra(select={
-            'hits_per_day':
-            'total_hits / datediff(now(), main_event.archive_time)'
+            'hits_per_day': hits_per_day_sql
         })
     )
 
