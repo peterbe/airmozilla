@@ -1,0 +1,49 @@
+{% extends 'main/main_base.html' %}
+{% set front_page = 0 %}
+
+{% block banner %}
+    {% include 'main/_banner_small.html' %}
+{% endblock %}
+
+{% block content_main %}
+
+  <form action="">
+  {{ form.q }} <button type="submit">Search</button>
+  </form>
+
+
+  {% for event in events %}
+    {% set href = url('main:event', slug=event.slug) %}
+    <article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
+      <header class="entry-header">
+        <h2 class="entry-title">
+          <a href="{{ href }}">{{ event.title }}</a>
+          {{ event.score }}
+        </h2>
+        {% include 'main/_event_privacy.html' %}
+        {% if event.is_upcoming() %}
+        <h5 class="entry-upcoming">
+        Upcoming event
+        </h5>
+        {% endif %}
+      </header>
+      <div class="entry-summary">
+        <p class="event-date">{{ event.start_time|js_date }}</p>
+        {% set thumb = thumbnail(event.placeholder_img, '68x68', crop='center') %}
+        <a href="{{ href }}">
+          <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+               alt="{{ event.title }}" class="attachment-68x68 wp-post-image">
+        </a>
+        <p>
+          {{ short_desc(event) }}
+          <a class="go" href="{{ href }}">{{ _('See more') }}</a>
+        </p>
+      </div>
+    </article>
+  {% else %}
+    {% if q %}
+      <h4>Nothing found</h4>
+    {% endif %}
+  {% endfor %}
+
+{% endblock %}
