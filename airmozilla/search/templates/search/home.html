@@ -7,18 +7,14 @@
 
 {% block content_main %}
 
-  <form action="">
-  {{ form.q }} <button type="submit">Search</button>
-  </form>
-
-
   {% for event in events %}
     {% set href = url('main:event', slug=event.slug) %}
     <article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
       <header class="entry-header">
+        <!-- score, title: {{ event.score_title }} -->
+        <!-- score, description: {{ event.score_desc }} -->
         <h2 class="entry-title">
-          <a href="{{ href }}">{{ event.title }}</a>
-          {{ event.score }}
+          <a href="{{ href }}">{{ event.title|highlight(q) }}</a>
         </h2>
         {% include 'main/_event_privacy.html' %}
         {% if event.is_upcoming() %}
@@ -35,7 +31,7 @@
                alt="{{ event.title }}" class="attachment-68x68 wp-post-image">
         </a>
         <p>
-          {{ short_desc(event) }}
+          {{ short_desc(event)|highlight(q) }}
           <a class="go" href="{{ href }}">{{ _('See more') }}</a>
         </p>
       </div>

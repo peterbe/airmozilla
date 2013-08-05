@@ -49,22 +49,20 @@ def _search(q, **options):
     if options.get('sort') == 'date':
         raise NotImplementedError
 
-    #title_sql = 'MATCH(title) AGAINST(%s)'
-    #description_sql = 'MATCH(description,short_description) AGAINST(%s)'
     sql = """
     (MATCH(title) AGAINST(%s) OR
     MATCH(description,short_description) AGAINST(%s))
     """
     search_escaped = q
     qs = qs.extra(
-        #where=[title_sql, description_sql],
         where=[sql],
         params=[search_escaped, search_escaped],
-        #select={
-        #    'score': 'MATCH(title) AGAINST(%s)' % search_escaped
-        #}
+        select={
+            'score_title': 'match(title) against(%s)',
+            'score_desc': 'match(description, short_description) '
+                          'against(%s)',
+        },
+        select_params=[search_escaped, search_escaped],
     )
-    #archived_events = Event.objects.archived()
-    print qs.query
-    qs = qs[:20]
+    qs = qs.order_by('-score_title', '-score_desc')
     return qs
