@@ -1,9 +1,15 @@
+import urllib
+
 from django.shortcuts import render
+from django import http
 
 from airmozilla.main.models import Event
 from airmozilla.main.views import is_contributor
 
+from funfactory.urlresolvers import reverse
+
 from . import forms
+from airmozilla.base.utils import paginate
 
 
 def home(request):
@@ -24,12 +30,35 @@ def home(request):
         else:
             privacy_filter = {'privacy': Event.PRIVACY_PUBLIC}
 
-        context['events'] = _search(
+        events = _search(
             request.GET.get('q'),
             privacy_filter=privacy_filter,
             privacy_exclude=privacy_exclude,
             sort=request.GET.get('sort'),
         )
+        try:
+            page = int(request.GET.get('page', 1))
+            if page < 1:
+                raise ValueError
+        except ValueError:
+            return http.HttpResponseBadRequest('Invalid page')
+        events_paged = paginate(events, page, 10)
+        next_page_url = prev_page_url = None
+
+        def url_maker(page):
+            querystring = {'q': context['q'], 'page': page}
+            querystring = urllib.urlencode(querystring)
+            return '%s?%s' % (reverse('search:home'), querystring)
+
+        if events_paged.has_next():
+            next_page_url = url_maker(events_paged.next_page_number())
+        if events_paged.has_previous():
+            prev_page_url = url_maker(events_paged.previous_page_number())
+
+        context['events_paged'] = events_paged
+        context['next_page_url'] = next_page_url
+        context['prev_page_url'] = prev_page_url
+
     else:
         context['events'] = []
 

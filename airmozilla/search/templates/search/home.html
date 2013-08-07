@@ -7,7 +7,7 @@
 
 {% block content_main %}
 
-  {% for event in events %}
+  {% for event in events_paged %}
     {% set href = url('main:event', slug=event.slug) %}
     <article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
       <header class="entry-header">
@@ -41,5 +41,26 @@
       <h4>Nothing found</h4>
     {% endif %}
   {% endfor %}
+
+  {% if next_page_url or prev_page_url %}
+  <nav class="nav-paging">
+    <ul role="navigation">
+      {% if next_page_url %}
+        <li class="prev">
+          <a href="{{ next_page_url }}">
+            {{ _('Next page') }}
+          </a>
+        </li>
+      {% endif %}
+      {% if prev_page_url %}
+        <li class="next">
+          <a href="{{ prev_page_url }}">
+            {{ _('Previous page') }}
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 
 {% endblock %}
