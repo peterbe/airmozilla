@@ -9,11 +9,15 @@ from airmozilla.main.views import is_contributor
 from funfactory.urlresolvers import reverse
 
 from . import forms
-from airmozilla.base.utils import paginate
+from airmozilla.base.utils import paginator
 
 
 def home(request):
-    context = {}
+    context = {
+        'q': None,
+        'events_found': None,
+        'search_error': None,
+    }
 
     if request.GET.get('q'):
         form = forms.SearchForm(request.GET)
@@ -42,7 +46,11 @@ def home(request):
                 raise ValueError
         except ValueError:
             return http.HttpResponseBadRequest('Invalid page')
-        events_paged = paginate(events, page, 10)
+
+        # we use the paginator() function to get the Paginator
+        # instance so we can avoid calling `events.count()` for the
+        # header of the page where it says "XX events found"
+        pager, events_paged = paginator(events, page, 10)
         next_page_url = prev_page_url = None
 
         def url_maker(page):
@@ -58,7 +66,9 @@ def home(request):
         context['events_paged'] = events_paged
         context['next_page_url'] = next_page_url
         context['prev_page_url'] = prev_page_url
-
+        context['events_found'] = pager.count
+    elif request.GET.get('q'):
+        context['search_error'] = form.errors['q']
     else:
         context['events'] = []
 

@@ -7,6 +7,20 @@
 
 {% block content_main %}
 
+  {% if search_error %}
+    <p><strong>Search Error</strong> {{ search_error }}</p>
+  {% endif %}
+
+  {% if events_found %}
+    <p>
+    {% if events_found == 1 %}
+      <strong>1</strong> event found
+    {% else %}
+      <strong>{{ events_found }}</strong> events found
+    {% endif %}
+    </p>
+  {% endif %}
+
   {% for event in events_paged %}
     {% set href = url('main:event', slug=event.slug) %}
     <article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
