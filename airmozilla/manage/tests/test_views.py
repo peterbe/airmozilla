@@ -403,11 +403,11 @@ class TestEvents(ManageTestCase):
 
     def test_find_event(self):
         """Find event responds with filtered results or raises error."""
-        response_ok = self.client.post(reverse('manage:events'),
-                                       {'title': 'test'})
+        response_ok = self.client.get(reverse('manage:events'),
+                                      {'title': 'event'})
         eq_(response_ok.status_code, 200)
         ok_(response_ok.content.find('Test event') >= 0)
-        response_fail = self.client.post(reverse('manage:events'),
+        response_fail = self.client.get(reverse('manage:events'),
                                          {'title': 'laskdjflkajdsf'})
         eq_(response_fail.status_code, 200)
         ok_(response_fail.content.find('No event') >= 0)
