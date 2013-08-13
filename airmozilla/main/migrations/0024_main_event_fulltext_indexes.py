@@ -8,12 +8,26 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # You are running MySQL 5.6 right?
-        db.execute("ALTER TABLE main_event ADD FULLTEXT KEY (title)")
-        db.execute("ALTER TABLE main_event ADD FULLTEXT KEY (description, short_description)")
+        # You are running PostgresSQL right
+        db.execute("""
+        CREATE INDEX main_event_title_fts_idx
+        ON main_event
+        USING gin(to_tsvector('english', title));
+
+        -- Note, this works without coalesce() because description and
+        -- short_description are both NOT NULL
+        CREATE INDEX main_event_desc_fts_idx
+        ON main_event
+        USING gin(to_tsvector('english', description || ' ' || short_description));
+
+        """)
+        #db.execute("ALTER TABLE main_event ADD FULLTEXT KEY (description, short_description)")
 
     def backwards(self, orm):
-        raise RuntimeError("Cannot reverse this migration.")
+        db.execute("""
+        DROP INDEX main_event_title_fts_idx;
+        DROP INDEX main_event_desc_fts_idx;
+        """)
 
     models = {
         'auth.group': {

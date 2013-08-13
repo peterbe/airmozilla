@@ -89,19 +89,34 @@ def _search(q, **options):
         raise NotImplementedError
 
     sql = """
-    (MATCH(title) AGAINST(%s) OR
-    MATCH(description,short_description) AGAINST(%s))
+    (
+      to_tsvector('english', title) @@ plainto_tsquery('english', %s)
+      OR
+      to_tsvector('english', description || ' ' || short_description)
+       @@ plainto_tsquery('english', %s)
+    )
     """
     search_escaped = q
     qs = qs.extra(
         where=[sql],
         params=[search_escaped, search_escaped],
         select={
-            'score_title': 'match(title) against(%s)',
-            'score_desc': 'match(description, short_description) '
-                          'against(%s)',
+            'title_highlit': "ts_headline('english', title, "
+                             "plainto_tsquery('english', %s))",
+            'desc_highlit': "ts_headline('english', short_description, "
+                            "plainto_tsquery('english', %s))",
+            'rank_title': "ts_rank_cd(to_tsvector('english', title), "
+                          "plainto_tsquery('english', %s))",
+            'rank_desc': "ts_rank_cd(to_tsvector('english', description "
+                         "|| ' ' || short_description), "
+                         "plainto_tsquery('english', %s))",
         },
-        select_params=[search_escaped, search_escaped],
+        select_params=[
+            search_escaped,
+            search_escaped,
+            search_escaped,
+            search_escaped
+        ],
     )
-    qs = qs.order_by('-score_title', '-score_desc')
+    qs = qs.order_by('-rank_title', '-rank_desc', '-start_time')
     return qs

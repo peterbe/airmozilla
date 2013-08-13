@@ -5,6 +5,14 @@
     {% include 'main/_banner_small.html' %}
 {% endblock %}
 
+{% block extra_head %}
+{{ super() }}
+<style type="text/css">
+.entry-title a b { font-style:italic; }
+.entry-summary p.desc b { font-style:italic; }
+</style>
+{% endblock %}
+
 {% block content_main %}
 
   {% if search_error %}
@@ -25,10 +33,10 @@
     {% set href = url('main:event', slug=event.slug) %}
     <article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
       <header class="entry-header">
-        <!-- score, title: {{ event.score_title }} -->
-        <!-- score, description: {{ event.score_desc }} -->
+        <!-- rank title: {{ event.rank_title }} -->
+        <!-- rank desc: {{ event.rank_desc }} -->
         <h2 class="entry-title">
-          <a href="{{ href }}">{{ event.title|highlight(q) }}</a>
+          <a href="{{ href }}">{{ event.title_highlit|safe }}</a>
         </h2>
         {% include 'main/_event_privacy.html' %}
         {% if event.is_upcoming() %}
@@ -44,8 +52,12 @@
           <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
                alt="{{ event.title }}" class="attachment-68x68 wp-post-image">
         </a>
-        <p>
-          {{ short_desc(event)|highlight(q) }}
+        <p class="desc">
+          {% if event.desc_highlit %}
+          {{ event.desc_highlit|safe }}
+          {% else %}
+          {{ short_desc(event) }}
+          {% endif %}
           <a class="go" href="{{ href }}">{{ _('See more') }}</a>
         </p>
       </div>

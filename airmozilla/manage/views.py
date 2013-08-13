@@ -331,7 +331,10 @@ def events(request):
             if exact:
                 search_results = exact
             else:
-                title_sql = 'MATCH(title) AGAINST(%s)'
+                title_sql = (
+                    "to_tsvector('english', title) "
+                    "@@ plainto_tsquery('english', %s)"
+                )
                 search_results = search_results.extra(
                     where=[title_sql],
                     params=[search_form.cleaned_data['title']]

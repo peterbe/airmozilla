@@ -412,7 +412,7 @@ class TestEvents(ManageTestCase):
         eq_(response_ok.status_code, 200)
         ok_(response_ok.content.find('Test event') >= 0)
         response_fail = self.client.get(reverse('manage:events'),
-                                         {'title': 'laskdjflkajdsf'})
+                                        {'title': 'laskdjflkajdsf'})
         eq_(response_fail.status_code, 200)
         ok_(response_fail.content.find('No event') >= 0)
 
@@ -2100,7 +2100,25 @@ class TestEventTweets(ManageTestCase):
     }
     placeholder = 'airmozilla/manage/tests/firefox.png'
 
-    def test_prepare_new_tweet(self):
+    @mock.patch('urllib.urlopen')
+    def test_prepare_new_tweet(self, p_urlopen):
+
+        def mocked_read():
+            r = {
+                u'status_code': 200,
+                u'data': {
+                    u'url': u'http://mzl.la/1adh2wT',
+                    u'hash': u'1adh2wT',
+                    u'global_hash': u'1adh2wU',
+                    u'long_url': u'https://air.mozilla.org/it-buildout/',
+                    u'new_hash': 0
+                },
+                u'status_txt': u'OK'
+            }
+            return json.dumps(r)
+
+        p_urlopen().read.side_effect = mocked_read
+
         event = Event.objects.get(title='Test event')
         # the event must have a real placeholder image
         with open(self.placeholder) as fp:
@@ -2134,7 +2152,8 @@ class TestEventTweets(ManageTestCase):
         event = Event.objects.get(pk=event.pk)
         event_url = 'http://testserver'
         event_url += reverse('main:event', args=(event.slug,))
-        ok_(event_url in textarea)
+        ok_('http://mzl.la/1adh2wT' in textarea)
+        ok_(event_url not in textarea)
 
         # try to submit it with longer than 140 characters
         response = self.client.post(url, {
