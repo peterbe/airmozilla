@@ -317,14 +317,28 @@ def events(request):
         creator_filter = {}
     else:
         creator_filter = {'creator': request.user}
-    search_results = []
-    if request.method == 'POST':
-        search_form = forms.EventFindForm(request.POST)
+    search_results = None
+    if request.GET.get('title'):
+        search_form = forms.EventFindForm(request.GET)
         if search_form.is_valid():
             search_results = Event.objects.filter(
-                title__icontains=search_form.cleaned_data['title'],
+                #title__icontains=search_form.cleaned_data['title'],
                 **creator_filter
-            ).order_by('-start_time')
+            )
+            exact = search_results.filter(
+                title=search_form.cleaned_data['title']
+            )
+            if exact:
+                search_results = exact
+            else:
+                title_sql = 'MATCH(title) AGAINST(%s)'
+                search_results = search_results.extra(
+                    where=[title_sql],
+                    params=[search_form.cleaned_data['title']]
+                )
+                search_results = search_results.order_by('-start_time')
+        else:
+            search_results = Event.objects.none()
     else:
         search_form = forms.EventFindForm()
     initiated = (Event.objects.initiated().filter(**creator_filter)
