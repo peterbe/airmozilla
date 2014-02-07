@@ -198,11 +198,19 @@ class EventRequestForm(BaseModelForm):
         return data
 
 
+def get_all_group_choices():
+    pass
+
+
 class EventEditForm(EventRequestForm):
     approvals = forms.ModelMultipleChoiceField(
         queryset=Group.objects.filter(permissions__codename='change_approval'),
         required=False,
         widget=forms.CheckboxSelectMultiple()
+    )
+    curated_groups = forms.MultipleChoiceField(
+        choices=get_all_group_choices(),
+        required=False
     )
 
     class Meta(EventRequestForm.Meta):

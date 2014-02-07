@@ -352,6 +352,13 @@ class Event(models.Model):
         return tz.normalize(self.start_time)
 
 
+class CuratedGroups(models.Model):
+
+    event = models.ForeignKey(Event)
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(default=_get_now)
+
+
 class SuggestedEvent(models.Model):
     user = models.ForeignKey(User)
     title = models.CharField(max_length=200)
