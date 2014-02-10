@@ -2242,3 +2242,22 @@ def comment_edit(request, id):
     context['event'] = comment.event
     context['form'] = form
     return render(request, 'manage/comment_edit.html', context)
+
+
+@permission_required('main.change_comment')
+@json_view
+def curated_groups_autocomplete(request):
+    q = request.GET.get('q').strip()
+    cache_key = 'all_mozillian_groups'
+    all = cache.get(cache_key)
+    if all is None:
+        all = mozillians.get_all_groups()
+        cache.set(cache_key, all, ONE_HOUR)
+
+    groups = [
+        (x['name'], '%s (%d members)' % (x['name'], x['number_of_members']))
+        for x in all
+        if q.lower() in x['name'].lower()
+    ]
+
+    return {'groups': groups}

@@ -5,12 +5,14 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.flatpages.models import FlatPage
+from django.core.cache import cache
 from django.utils.timezone import utc
 from funfactory.urlresolvers import reverse
 
 from slugify import slugify
 
 from airmozilla.base.forms import BaseModelForm, BaseForm
+from airmozilla.base import mozillians
 from airmozilla.manage import url_transformer
 from airmozilla.main.models import (
     Approval,
@@ -30,6 +32,8 @@ from airmozilla.comments.models import Discussion, Comment
 
 
 TIMEZONE_CHOICES = [(tz, tz.replace('_', ' ')) for tz in pytz.common_timezones]
+
+ONE_HOUR = 60 * 60
 
 
 class UserEditForm(BaseModelForm):
@@ -198,8 +202,18 @@ class EventRequestForm(BaseModelForm):
         return data
 
 
+"""
 def get_all_group_choices():
-    pass
+    cache_key = 'all_mozillian_groups'
+    all = cache.get(cache_key)
+    if all is None:
+        all = mozillians.get_all_groups()
+        cache.set(cache_key, all, ONE_HOUR)
+    return [
+        (x['name'], '%s (%d members)' % (x['name'], x['number_of_members']))
+        for x in all
+    ]
+"""
 
 
 class EventEditForm(EventRequestForm):
@@ -208,10 +222,11 @@ class EventEditForm(EventRequestForm):
         required=False,
         widget=forms.CheckboxSelectMultiple()
     )
-    curated_groups = forms.MultipleChoiceField(
-        choices=get_all_group_choices(),
-        required=False
-    )
+    curated_groups = forms.CharField(max_length=200, required=False)
+    #curated_groups = forms.MultipleChoiceField(
+    #    choices=get_all_group_choices(),
+    #    required=False
+    #)
 
     class Meta(EventRequestForm.Meta):
         exclude = ('archive_time',)

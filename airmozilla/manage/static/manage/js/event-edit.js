@@ -24,4 +24,25 @@ $(function() {
         });
     }
 
+
+    // Autocomplete curated groups
+    function process_curated_groups(element) {
+        return data;
+    }
+    $('#id_curated_groups').select2({
+        placeholder: "Search for a Mozillians group",
+        minimumInputLength: 2,
+        ajax: {
+            url: '/manage/curated-groups-autocomplete/',
+            dataType: 'json',
+            data: function (term, page) {
+                return {q: term};
+            },
+            results: function (data, page) {
+                return {results: data.groups};
+            }
+        },
+        initSelection: process_curated_groups
+    });
+
 });
