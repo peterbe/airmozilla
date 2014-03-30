@@ -424,6 +424,7 @@ def events_data(request):
             'title': event.title,
             'slug': event.slug,
             'location': event.location and event.location.name or '',
+            'is_active_location':event.location.is_active,
             'edit_url': reverse('manage:event_edit', args=(event.pk,)),
             'start_time': start_time,
             'start_time_iso': start_time_iso,
