@@ -9,7 +9,7 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
-from django.utils import timezone
+from django.utils.timezone import utc
 
 from airmozilla.base.utils import unique_slugify
 from airmozilla.main.fields import EnvironmentField
@@ -20,7 +20,7 @@ from sorl.thumbnail import ImageField
 
 
 def _get_now():
-    return timezone.now()
+    return datetime.datetime.utcnow().replace(tzinfo=utc)
 
 
 def _get_live_time():
@@ -189,10 +189,35 @@ class Template(models.Model):
         return self.name
 
 
+class Region(models.Model):
+    """Region of a video/stream/presentation/etc."""
+    name = models.CharField(max_length=300)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __unicode__(self):
+        return self.name
+
+
 class Location(models.Model):
     """Venue/location of a video/stream/presentation/etc."""
     name = models.CharField(max_length=300)
     timezone = models.CharField(max_length=250)
+    is_active = models.BooleanField(default=True)
+    regions = models.ManyToManyField(Region, blank=True, null=True,)
+
+    class Meta:
+        ordering = ['name']
+
+    def __unicode__(self):
+        return self.name
+
+
+class Region(models.Model):
+    """Region of a video/stream/presentation/etc."""
+    name = models.CharField(max_length=300)
     is_active = models.BooleanField(default=True)
 
     class Meta:
