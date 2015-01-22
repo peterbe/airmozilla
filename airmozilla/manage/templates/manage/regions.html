@@ -11,8 +11,8 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th style="width:200px">Locations</th>
-        <th></th>
+        <th>Locations</th>
+        <th style="width:200px"></th>
       </tr>
     </thead>
     <tbody>
@@ -23,6 +23,9 @@
           {% if not region.is_active %}
           <span class="label label-default" title="Inactive region">Inactive</span>
           {% endif %}
+        </td>
+        <td>
+          {{ region.location_set.all().count() }}
         </td>
         <td>
           <a class="btn btn-default btn-sm" href="{{ url('manage:region_edit', region.id) }}">
