@@ -1,0 +1,48 @@
+{% extends 'main/main_base.html' %}
+{% set page = page|default('home') -%}
+
+{% block content_main %}
+  {% for event in events %}
+    {% set href = url('starred:event', slug=event.slug) %}
+    <article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
+      <header class="entry-header">
+        <h2 class="entry-title">
+          <a href="{{ href }}">{{ event.title }}</a>
+        </h2>
+        {% set curated_groups = get_curated_groups(event) %}
+        {% include 'main/_event_privacy.html' %}
+      </header>
+      <div class="entry-summary">
+        <p class="event-date">{{ event.start_time|js_date }}</p>
+        <a href="{{ href }}">
+          {{ show_thumbnail(event) }}
+        </a>
+        <p>
+          {{ short_desc(event) | safe_html }}
+          <a class="go" href="{{ href }}">{{ _('See more') }}</a>
+        </p>
+      </div>
+    </article>
+  {% endfor %}
+
+{% if next_page_url or prev_page_url %}
+  <nav class="nav-paging">
+    <ul>
+      {% if next_page_url %}
+        <li class="prev">
+          <a href="{{ next_page_url }}{% if tags %}?{{ tags_query_string(tags) }}{% endif %}">
+            {{ _('Older videos') }}
+          </a>
+        </li>
+      {% endif %}
+      {% if prev_page_url %}
+        <li class="next">
+          <a href="{{ prev_page_url }}{% if tags %}?{{ tags_query_string(tags) }}{% endif %}">
+            {{ _('Newer videos') }}
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+{% endblock %}

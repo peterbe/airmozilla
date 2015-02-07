@@ -33,6 +33,7 @@ INSTALLED_APPS = (
     '%s.search' % PROJECT_MODULE,
     '%s.comments' % PROJECT_MODULE,
     '%s.uploads' % PROJECT_MODULE,
+    '%s.starred' % PROJECT_MODULE,
     '%s.subtitles' % PROJECT_MODULE,
     '%s.surveys' % PROJECT_MODULE,
     '%s.roku' % PROJECT_MODULE,
