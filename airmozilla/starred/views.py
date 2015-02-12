@@ -15,9 +15,13 @@ from airmozilla.base.mozillians import fetch_user_name
 
 @json_view
 def sync_starred_events(request):
-    if request.method == 'POST':
-        decode = json.loads(request.body)
-        ids = decode['ids']
+    if request.user.is_anonymous():
+        ids = []
+        if request.method == 'POST':
+            ids = [ int(id) for id in request.POST.getlist('ids') ]
+        return {'ids': ids}
+    elif request.method == 'POST':
+        ids = request.POST.getlist('ids')
         # maybe we do it as a big long string delimited by ,
         # or maybe json. Easier in JQuery?
         #ids = [int(x) for x in ids.split(',')]
@@ -36,7 +40,7 @@ def sync_starred_events(request):
 
 
     starred = StarredEvents.objects.filter(user=request.user)
-    ids = [star.event.id for star in starred] #Better way to do this?
+    ids = list(starred.values_list('event_id', flat=True))
     return {'ids': ids}
 
 
