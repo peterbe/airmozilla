@@ -8,7 +8,7 @@ from nose.tools import eq_, ok_
 
 from airmozilla.main.models import Event
 from airmozilla.starred.models import (
-    StarredEvents,
+    StarredEvent,
 )
 
 
@@ -77,14 +77,14 @@ class TestStarredEvent(DjangoTestCase):
         event1 = Event.objects.get(title='Test event')
         event2 = self.create_event('Test event 2')
 
-        StarredEvents.objects.create(user=self.user, event=event1)
-        StarredEvents.objects.create(user=self.user, event=event2)
+        StarredEvent.objects.create(user=self.user, event=event1)
+        StarredEvent.objects.create(user=self.user, event=event2)
 
         response = self.client.post(url, {'ids': [event1.id]})
         eq_(response.status_code, 200)
 
-        ok_(StarredEvents.objects.filter(event=event1.id))
-        ok_(not StarredEvents.objects.filter(event=event2.id))
+        ok_(StarredEvent.objects.filter(event=event1.id))
+        ok_(not StarredEvent.objects.filter(event=event2.id))
 
 
     def test_invalid_starred_event_id(self):
