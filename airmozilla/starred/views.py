@@ -8,18 +8,16 @@ from django.core.cache import cache
 from django.db import transaction
 from jsonview.decorators import json_view
 
-from airmozilla.main.models import Event
-from .models import StarredEvents
 from airmozilla.base.mozillians import fetch_user_name
+from airmozilla.main.models import Event
+from airmozilla.starred.models import StarredEvents, Event
 
 
 @json_view
 def sync_starred_events(request):
     if request.user.is_anonymous():
         ids = []
-        if request.method == 'POST':
-            ids = [ int(id) for id in request.POST.getlist('ids') ]
-        return {'ids': ids}
+        return {'ids': []}
     elif request.method == 'POST':
         ids = request.POST.getlist('ids')
         # maybe we do it as a big long string delimited by ,
@@ -37,14 +35,14 @@ def sync_starred_events(request):
             except Event.DoesNotExist:
                 # ignore events that don't exist but fail on other errors
                 pass
-
+    
 
     starred = StarredEvents.objects.filter(user=request.user)
     ids = list(starred.values_list('event_id', flat=True))
     return {'ids': ids}
 
 
-def starred_events(request):
+def home(request):
     context = {}
    # I want to get all starred events for a user
     starred = StarredEvents.objects.filter(user=request.user)
@@ -52,7 +50,9 @@ def starred_events(request):
     #makes a QuerySet object based on Event
     events = Event.objects.filter(id__in=StarredEvents.objects.filter(
                 user=request.user).values('event_id'))
+    print events
     #Then you can do things like .filter(other=things).count() etc.
     context['events'] = events
+    print context
 
-    return render(request, 'starred/starred.html', context)
+    return render(request, 'starred/home.html', context)
