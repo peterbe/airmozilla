@@ -37,7 +37,7 @@ class TestStarredEvent(DjangoTestCase):
     def create_event(self, title):
         # instantiate test event
         event = Event.objects.get(title='Test event')
-        event_count = Event.objects.count();
+        event_count = Event.objects.count()
 
         # create more events 
         return Event.objects.create(
@@ -86,7 +86,6 @@ class TestStarredEvent(DjangoTestCase):
         ok_(StarredEvents.objects.filter(event=event1.id))
         ok_(not StarredEvents.objects.filter(event=event2.id))
 
-        event2.delete()
 
     def test_invalid_starred_event_id(self):
 
@@ -130,4 +129,4 @@ class TestStarredEvent(DjangoTestCase):
         response = self.client.post(url, send)
         receive = json.loads(response.content)
         # verify the list is returned to the user
-        eq_(send, receive)
+        eq_(receive, {'ids': []})
