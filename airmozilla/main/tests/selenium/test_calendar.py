@@ -15,13 +15,10 @@ class CalendarLiveServerTestCase(LiveServerTestCase):
     @optional_selenium
     def setUp(self):
         super(CalendarLiveServerTestCase, self).setUp()
-        self.driver = webdriver.PhantomJS()
+        self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(30)
         self.base_url = self.live_server_url
         self.driver.set_window_size(1120, 550)
-        # ugly hack necessary to clear localStorage
-        self.driver.get(self.base_url)
-        self.driver.execute_script('localStorage.clear()')
 
     def tearDown(self):
         self.driver.quit()
