@@ -46,12 +46,19 @@ def sync_starred_events(request):
 def home(request):
     context = {}
 
-    events = Event.objects.filter(id__in=StarredEvent.objects.filter(
-                user=request.user).values('event_id'))
+    starred_events_qs = (
+        StarredEvent.objects.filter(user=request.user)
+        .select_related('event')
+        .order_by('-created')
+    )
+
+    events = [s.event for s in starred_events_qs]
 
     curated_groups_map = collections.defaultdict(list)
     curated_groups = (
-        CuratedGroup.objects.all()
+        CuratedGroup.objects.filter(event__in=[
+            x.id for x in events
+        ])
         .values_list('event_id', 'name')
         .order_by('name')
     )
