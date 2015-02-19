@@ -36,7 +36,7 @@ def sync_starred_events(request):
             except Event.DoesNotExist:
                 # ignore events that don't exist but fail on other errors
                 pass
-    
+
 
     starred = StarredEvent.objects.filter(user=request.user)
     ids = list(starred.values_list('event_id', flat=True))
