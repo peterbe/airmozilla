@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from jsonview.decorators import json_view
 
 #from airmozilla.base.mozillians import fetch_user_name
+from funfactory.urlresolvers import reverse
+from airmozilla.base.utils import paginate
 from airmozilla.starred.models import StarredEvent, Event
 from airmozilla.main.models import (
     Event,
@@ -51,6 +53,21 @@ def home(request):
         .select_related('event')
         .order_by('-created')
     )
+    starred_paged = paginate(starred_events_qs, 1, 10)
+
+    # to simplify the complexity of the template when it tries to make the
+    # pagination URLs, we just figure it all out here
+    next_page_url = prev_page_url = None
+    if starred_paged.has_next():
+        next_page_url = reverse(
+            'starred:home',
+            args=(starred_paged.next_page_number(),)
+        )
+    if starred_paged.has_previous():
+        prev_page_url = reverse(
+            'starred:home',
+            args=(starred_paged.previous_page_number(),)
+        )
 
     events = [s.event for s in starred_events_qs]
 
@@ -71,6 +88,7 @@ def home(request):
     context= {
         'events': events,
         'get_curated_groups': get_curated_groups,
+        'next_page_url': next_page_url,
     }
 
     return render(request, 'starred/home.html', context)
