@@ -2,15 +2,11 @@ import json
 import collections
 
 from django.contrib.auth.models import User
-#from django import http
 from django.shortcuts import get_object_or_404, render, redirect
-#from django.template.loader import render_to_string
-#from django.core.cache import cache
-#from django.db import transaction
-from jsonview.decorators import json_view
 
-#from airmozilla.base.mozillians import fetch_user_name
+from jsonview.decorators import json_view
 from funfactory.urlresolvers import reverse
+
 from airmozilla.base.utils import paginate
 from airmozilla.starred.models import StarredEvent, Event
 from airmozilla.main.models import (
@@ -39,7 +35,6 @@ def sync_starred_events(request):
                 # ignore events that don't exist but fail on other errors
                 pass
 
-
     starred = StarredEvent.objects.filter(user=request.user)
     ids = list(starred.values_list('event_id', flat=True))
     return {'ids': ids}
@@ -54,9 +49,6 @@ def home(request, page=1):
         .order_by('-created')
     )
     starred_paged = paginate(starred_events_qs, page, 10)
-    print starred_paged
-    print
-
 
     # to simplify the complexity of the template when it tries to make the
     # pagination URLs, we just figure it all out here
@@ -72,13 +64,7 @@ def home(request, page=1):
             args=(starred_paged.previous_page_number(),)
         )
 
-    print next_page_url
-    print prev_page_url
-    print
-
     events = [s.event for s in starred_paged]
-    print events
-    print
 
     curated_groups_map = collections.defaultdict(list)
     curated_groups = (
