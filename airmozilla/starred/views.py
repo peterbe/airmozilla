@@ -45,7 +45,7 @@ def sync_starred_events(request):
     return {'ids': ids}
 
 
-def home(request):
+def home(request, page=1):
     context = {}
 
     starred_events_qs = (
@@ -53,7 +53,10 @@ def home(request):
         .select_related('event')
         .order_by('-created')
     )
-    starred_paged = paginate(starred_events_qs, 1, 10)
+    starred_paged = paginate(starred_events_qs, page, 10)
+    print starred_paged
+    print
+
 
     # to simplify the complexity of the template when it tries to make the
     # pagination URLs, we just figure it all out here
@@ -69,12 +72,18 @@ def home(request):
             args=(starred_paged.previous_page_number(),)
         )
 
-    events = [s.event for s in starred_events_qs]
+    print next_page_url
+    print prev_page_url
+    print
+
+    events = [s.event for s in starred_paged]
+    print events
+    print
 
     curated_groups_map = collections.defaultdict(list)
     curated_groups = (
         CuratedGroup.objects.filter(event__in=[
-            x.id for x in events
+            x.event.id for x in starred_paged
         ])
         .values_list('event_id', 'name')
         .order_by('name')
@@ -87,8 +96,10 @@ def home(request):
 
     context= {
         'events': events,
+        'stars': starred_paged,
         'get_curated_groups': get_curated_groups,
         'next_page_url': next_page_url,
+        'prev_page_url': prev_page_url,
     }
 
     return render(request, 'starred/home.html', context)

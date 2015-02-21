@@ -26,6 +26,7 @@ p.feed { float: right; }
     <a href="{{ href }}">
       {{ show_thumbnail(event) }}
     </a>
+    <a class="star star-off"></a>
     <p>
       {{ short_desc(event) | safe_html }}
       <a class="go" href="{{ href }}">{{ _('See more') }}</a>

@@ -5,7 +5,11 @@
   {% for event in events %}
   {{ article(event) }}
   {% endfor %}
-
+  <!-- OR
+  {% for star in starred %}
+  {{ article(star.event) }}
+  {% endfor %}
+ -->
 {% if next_page_url or prev_page_url %}
 {{ event_paginate(next_page_url, tags, prev_page_url) }}
   {% endif %}
