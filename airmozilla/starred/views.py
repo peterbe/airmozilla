@@ -64,8 +64,6 @@ def home(request, page=1):
             args=(starred_paged.previous_page_number(),)
         )
 
-    events = [s.event for s in starred_paged]
-
     curated_groups_map = collections.defaultdict(list)
     curated_groups = (
         CuratedGroup.objects.filter(event__in=[
@@ -81,8 +79,8 @@ def home(request, page=1):
         return curated_groups_map.get(event.id)
 
     context= {
-        'events': events,
-        'stars': starred_paged,
+        'events': [], # for main/home.html front_page
+        'starred': starred_paged,
         'get_curated_groups': get_curated_groups,
         'next_page_url': next_page_url,
         'prev_page_url': prev_page_url,

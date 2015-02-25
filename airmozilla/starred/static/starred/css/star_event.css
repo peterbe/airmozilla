@@ -1,4 +1,4 @@
-.star {
+a.star {
     background: url('../img/Star24YellowTransparent.png') no-repeat;
     height: 24px;
     width: 24px;
@@ -7,9 +7,10 @@
     left: 140px;
     top: 70px;
     opacity: 0.9;
+    cursor: pointer;
 }
 
-.star-off {
+a.star-off {
     background-position: -24px 0px;
 }
 
