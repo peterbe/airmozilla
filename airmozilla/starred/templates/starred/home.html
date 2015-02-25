@@ -7,6 +7,6 @@
   {% endfor %}
 
 {% if next_page_url or prev_page_url %}
-{{ event_paginate(next_page_url, tags, prev_page_url) }}
+{{ event_paginate(next_page_url, prev_page_url, tags=None) }}
   {% endif %}
 {% endblock %}

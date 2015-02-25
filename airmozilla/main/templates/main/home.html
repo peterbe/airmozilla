@@ -1,5 +1,5 @@
 {% extends 'main/main_base.html' %}
-{% set front_page = (events.number == 1) %}
+{% set front_page = (events and events.number == 1) %}
 
 {% block body_class %}with-sidebar{% endblock %}
 
@@ -35,7 +35,7 @@ p.feed { float: right; }
 </article>
 {% endmacro %}
 
-{% macro event_paginate(next_page_url, tags, prev_page_url) %}
+{% macro event_paginate(next_page_url, prev_page_url, tags) %}
   <nav class="nav-paging">
     <ul>
       {% if next_page_url %}
@@ -138,6 +138,6 @@ p.feed { float: right; }
   {% endfor %}
 
   {% if next_page_url or prev_page_url %}
-  {{ event_paginate(next_page_url, tags, prev_page_url) }}
+  {{ event_paginate(next_page_url, prev_page_url, tags) }}
   {% endif %}
 {% endblock %}

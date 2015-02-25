@@ -79,7 +79,6 @@ def home(request, page=1):
         return curated_groups_map.get(event.id)
 
     context= {
-        'events': [], # for main/home.html front_page
         'starred': starred_paged,
         'get_curated_groups': get_curated_groups,
         'next_page_url': next_page_url,
