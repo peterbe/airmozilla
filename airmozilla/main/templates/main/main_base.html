@@ -160,10 +160,11 @@ Air Mozilla | Mozilla, in Video
   {% endcompress %}
   {# Instead of using browser_js() we here include them manually. It'll make the page faster #}
   {% compress js %}
-  <script src="{{ static('starred/js/star_event.js') }}"></script>
   <script src="{{ static('js/libs/include.js') }}"></script>
   <script src="{{ static('browserid/api.js') }}"></script>
   <script src="{{ static('browserid/browserid.js') }}"></script>
+  <script src="{{ static('starred/js/star_event.js') }}"></script>
+  <script src="{{ static('js/libs/localforage.min.js') }}"></script>
   {% endcompress %}
 
 {% endblock %}

@@ -26,7 +26,7 @@ p.feed { float: right; }
     <a href="{{ href }}">
       {{ show_thumbnail(event) }}
     </a>
-    <a class="star star-off"></a>
+    <a class="star" data-id="{{ event.id }}"></a>
     <p>
       {{ short_desc(event) | safe_html }}
       <a class="go" href="{{ href }}">{{ _('See more') }}</a>
@@ -134,7 +134,7 @@ p.feed { float: right; }
   {% endif %}
 
   {% for event in events %}
-  {{ article(event) }}
+  {{ article_macro(event) }}
   {% endfor %}
 
   {% if next_page_url or prev_page_url %}
