@@ -9,7 +9,14 @@ a.star {
     opacity: 0.9;
     cursor: pointer;
 }
-
+a.star.live {
+    left: 190px;
+    top: 130px;
+}
+a.star.sidebar {
+    left: 138px;
+    top: 68px;
+}
 a.star-on {
     background-position: 0 0;
 }

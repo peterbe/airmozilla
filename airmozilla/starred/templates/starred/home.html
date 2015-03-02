@@ -1,7 +1,12 @@
 {% extends 'main/home.html' %}
 {% set page = page|default('home') -%}
 
+{% block page_title %}
+Starred Events | {{ super() }}
+{% endblock %}
+
 {% block content_main %}
+<h2 class="section-title">Starred Events</h2>
   {% for star in starred %}
   {{ article_macro(star.event) }}
   {% endfor %}
