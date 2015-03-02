@@ -6,6 +6,7 @@
     ('Channels', 'main:channels', 'channels', True, ''),
     ('Calendar', 'main:calendar', 'calendar', True, ''),
     ('Tag Cloud', 'main:tag_cloud', 'tag_cloud', True, ''),
+    ('Starred', 'starred:home', 'starred', request.user.is_active, ''),
     ('Requests', 'suggest:start', 'suggest', request.user.is_active, ''),
     ('Management', 'manage:events', '', request.user.is_staff, ''),
     ('Sign out', '/browserid/logout/', '', request.user.is_active, 'browserid-logout'),
@@ -150,7 +151,6 @@ Air Mozilla | Mozilla, in Video
   <script src="{{ static('browserid/api.js') }}"></script>
   <script src="{{ static('browserid/browserid.js') }}"></script>
   <script src="{{ static('starred/js/star_event.js') }}"></script>
-  <script src="{{ static('js/libs/localforage.min.js') }}"></script>
   {% endcompress %}
 
 {% endblock %}

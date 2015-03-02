@@ -61,15 +61,16 @@ class TestStarredEvent(DjangoTestCase):
 
         # get the empty list of event ids in json format 
         structure = json.loads(response.content)
-        eq_(structure, {"ids": []})
+        csrf_token = structure['csrf_token']
+        eq_(structure, {'csrf_token': csrf_token, "ids": []})
 
         # add an event id to the list
         structure['ids'].append(event1.id)
         # send synced list to browser
-        response = self.client.post(url, {'ids': structure['ids']})
+        response = self.client.post(url, {'ids[]': structure['ids']})
         # get the list and verify it was updated
         structure = json.loads(response.content)
-        eq_(structure, {"ids": [event1.id]})
+        eq_(structure, {'csrf_token': csrf_token, "ids": [event1.id]})
 
 
     def test_removed_starred_event(self):
@@ -80,7 +81,7 @@ class TestStarredEvent(DjangoTestCase):
         StarredEvent.objects.create(user=self.user, event=event1)
         StarredEvent.objects.create(user=self.user, event=event2)
 
-        response = self.client.post(url, {'ids': [event1.id]})
+        response = self.client.post(url, {'ids[]': [event1.id]})
         eq_(response.status_code, 200)
 
         ok_(StarredEvent.objects.filter(event=event1.id))
@@ -98,23 +99,24 @@ class TestStarredEvent(DjangoTestCase):
 
         # get the empty list of event ids in json format 
         structure = json.loads(response.content)
-        eq_(structure, {"ids": []})
+        csrf_token = structure['csrf_token']
+        eq_(structure, {'csrf_token': csrf_token, "ids": []})
 
         # add event id to the list
         structure['ids'].append(event1.id)
         # send list to the browser
-        response = self.client.post(url, {'ids': structure['ids']})
+        response = self.client.post(url, {'ids[]': structure['ids']})
         # get the list and verify it was updated
         structure = json.loads(response.content)
-        eq_(structure, {"ids": [event1.id]})
+        eq_(structure, {'csrf_token': csrf_token, "ids": [event1.id]})
 
         # delete event
         new_event = event1.delete()
         # send updated list to the browser
-        response = self.client.post(url, {'ids': structure['ids']})
+        response = self.client.post(url, {'ids[]': structure['ids']})
         # get the list and verify it was updated
         structure = json.loads(response.content)
-        eq_(structure, {"ids": []})
+        eq_(structure, {'csrf_token': csrf_token, "ids": []})
 
 
     def test_anonymous_user(self):
@@ -128,5 +130,6 @@ class TestStarredEvent(DjangoTestCase):
         # send list to the browser
         response = self.client.post(url, send)
         receive = json.loads(response.content)
+        csrf_token = receive['csrf_token']
         # verify the list is returned to the user
-        eq_(receive, {'ids': []})
+        eq_(receive, {'csrf_token': csrf_token, 'ids': []})

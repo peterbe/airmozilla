@@ -3,6 +3,9 @@ import collections
 
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
+from django.views.decorators import cache
+from django.core.context_processors import csrf
+from session_csrf import anonymous_csrf
 
 from jsonview.decorators import json_view
 from funfactory.urlresolvers import reverse
@@ -14,14 +17,19 @@ from airmozilla.main.models import (
     CuratedGroup,
 )
 
-
+@cache.cache_control(private=True)
+@anonymous_csrf
 @json_view
 def sync_starred_events(request):
+    context = {'csrf_token': request.csrf_token}
     if request.user.is_anonymous():
-        ids = []
-        return {'ids': []}
+        context['ids'] = []
+        return context
     elif request.method == 'POST':
-        ids = request.POST.getlist('ids')
+        context['isLoggedIn'] = True
+        context['csrf_token'] = request.csrf_token
+        # ids requires the [] because $.param() method serializes deep objects recursively
+        ids = request.POST.getlist('ids[]')
         StarredEvent.objects.filter(user=request.user).exclude(
             id__in=ids).delete()
         for id in ids:
@@ -36,8 +44,8 @@ def sync_starred_events(request):
                 pass
 
     starred = StarredEvent.objects.filter(user=request.user)
-    ids = list(starred.values_list('event_id', flat=True))
-    return {'ids': ids}
+    context['ids'] = list(starred.values_list('event_id', flat=True))
+    return context
 
 
 def home(request, page=1):
