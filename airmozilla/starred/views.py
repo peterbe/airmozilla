@@ -26,10 +26,7 @@ def sync_starred_events(request):
         context['ids'] = []
         return context
     elif request.method == 'POST':
-        context['isLoggedIn'] = True
-        context['csrf_token'] = request.csrf_token
-        # ids requires the [] because $.param() method serializes deep objects recursively
-        ids = request.POST.getlist('ids[]')
+        ids = request.POST.getlist('ids')
         StarredEvent.objects.filter(user=request.user).exclude(
             id__in=ids).delete()
         for id in ids:

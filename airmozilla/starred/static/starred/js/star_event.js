@@ -1,53 +1,50 @@
+
 $(function() {
     var stars = [],
-    csrf_token,
-    isLoggedIn,
+    csrfToken,
+    signedIn = !!$('starred-event').length,
     from_browser = localStorage.getItem('stars');
-
 
    function triggerClickedStars() {
         $('a.star').each(function(i, element) {
-            var index = stars.indexOf($(element).data('id'))
+            var $element = $(element);
+            var index = stars.indexOf($(element).data('id'));
             if (index > -1) {
-                $(element).addClass('star-on')
-            }
-            else {
-                $(element).removeClass('star-on')
+                $(element).addClass('star-on');
             }
         });
    }
 
    function initialSync() {
-       $.getJSON('/starred/sync/').then(function(response) {
+       $.getJSON($('starred-event').data('get')).then(function(response) {
            if (response) {
-               csrf_token = response.csrf_token;
-               isLoggedIn = response.isLoggedIn;
+               csrfToken = response.csrf_token;
                stars.concat(response.ids);
-               if (csrf_token)
+               if (csrfToken) {
                   sync();
+               }
            }
        });
    }
 
    function sync() {
-      if (!csrf_token)
+      if (!csrfToken) {
           return initialSync();
-      if (!isLoggedIn)
-          return;
-
-// Can also set this to $.param({'ids': stars, 'csrfmiddlewaretoken': csrf_token}, true).then(
-// and remove the square brackets from starred/views.py line 30
-// Or manually encode and decode JSON. See http://api.jquery.com/jQuery.param/
-       $.post('/starred/sync/', {'ids': stars, 'csrfmiddlewaretoken': csrf_token}).then(
-               function(response) {
-                   if (response) {
-                       csrf_token = response.csrf_token;
-                       isLoggedIn = response.isLoggedIn;
-                       stars = response.ids;
-                       localStorage.setItem('stars', JSON.stringify(stars));
-                       triggerClickedStars();
-                   }
-               });
+      }
+      if (signedIn) {
+          $.post($('starred-event').data('post'), $.param( {
+              'ids': stars,
+              'csrfmiddlewaretoken': csrfToken
+          }, true))
+          .then( function(response) {
+              if (response) {
+                  csrfToken = response.csrf_token;
+                  stars = response.ids;
+                  localStorage.setItem('stars', JSON.stringify(stars));
+                  triggerClickedStars();
+              }
+          });
+      }
    }
 
    function toggleArrayPresence(id) {

@@ -58,6 +58,9 @@ Air Mozilla | Mozilla, in Video
           {% endif %}
       </ul>
     </nav>
+          {% if request.user.is_authenticated() %}
+          <starred-event data-get="{{ url('starred:sync') }}" data-post="{{ url('starred:sync') }}" />
+          {% endif %}
     {% block banner %}
       {% include 'main/_banner_small.html' %}
     {% endblock %}
