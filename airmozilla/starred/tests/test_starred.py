@@ -30,7 +30,7 @@ class TestStarredEvent(DjangoTestCase):
         super(TestStarredEvent, self).setUp()
 
         # create the url
-        self.url = reverse('starred:sync_starred_events')
+        self.url = reverse('starred:sync')
         # so, let's sign in
         self.user =  self._login(username='lisa')
 
@@ -67,7 +67,7 @@ class TestStarredEvent(DjangoTestCase):
         # add an event id to the list
         structure['ids'].append(event1.id)
         # send synced list to browser
-        response = self.client.post(url, {'ids[]': structure['ids']})
+        response = self.client.post(url, {'ids': structure['ids']})
         # get the list and verify it was updated
         structure = json.loads(response.content)
         eq_(structure, {'csrf_token': csrf_token, "ids": [event1.id]})
@@ -81,7 +81,7 @@ class TestStarredEvent(DjangoTestCase):
         StarredEvent.objects.create(user=self.user, event=event1)
         StarredEvent.objects.create(user=self.user, event=event2)
 
-        response = self.client.post(url, {'ids[]': [event1.id]})
+        response = self.client.post(url, {'ids': [event1.id]})
         eq_(response.status_code, 200)
 
         ok_(StarredEvent.objects.filter(event=event1.id))
@@ -105,7 +105,7 @@ class TestStarredEvent(DjangoTestCase):
         # add event id to the list
         structure['ids'].append(event1.id)
         # send list to the browser
-        response = self.client.post(url, {'ids[]': structure['ids']})
+        response = self.client.post(url, {'ids': structure['ids']})
         # get the list and verify it was updated
         structure = json.loads(response.content)
         eq_(structure, {'csrf_token': csrf_token, "ids": [event1.id]})
