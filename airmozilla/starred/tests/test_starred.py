@@ -1,11 +1,8 @@
 import json
 
 from airmozilla.base.tests.testbase import DjangoTestCase
-from django.contrib.auth.models import User
-
 from funfactory.urlresolvers import reverse
 from nose.tools import eq_, ok_
-
 from airmozilla.main.models import Event
 from airmozilla.starred.models import (
     StarredEvent,
@@ -22,9 +19,7 @@ class TestStarredEvent(DjangoTestCase):
 # test that the proper list of starred events is displayed
 # add star, sync 
 # remove star, add different star, sync
-
 # test what happens when a user isn't logged in
-
 
     def setUp(self):
         super(TestStarredEvent, self).setUp()
@@ -39,7 +34,7 @@ class TestStarredEvent(DjangoTestCase):
         event = Event.objects.get(title='Test event')
         event_count = Event.objects.count()
 
-        # create more events 
+        # create more events
         return Event.objects.create(
             title=title,
             slug='event' + str(event_count),
@@ -59,7 +54,7 @@ class TestStarredEvent(DjangoTestCase):
         response = self.client.get(url)
         eq_(response.status_code, 200)
 
-        # get the empty list of event ids in json format 
+        # get the empty list of event ids in json format
         structure = json.loads(response.content)
         csrf_token = structure['csrf_token']
         eq_(structure, {'csrf_token': csrf_token, "ids": []})
@@ -71,7 +66,6 @@ class TestStarredEvent(DjangoTestCase):
         # get the list and verify it was updated
         structure = json.loads(response.content)
         eq_(structure, {'csrf_token': csrf_token, "ids": [event1.id]})
-
 
     def test_removed_starred_event(self):
         url = self.url
@@ -87,7 +81,6 @@ class TestStarredEvent(DjangoTestCase):
         ok_(StarredEvent.objects.filter(event=event1.id))
         ok_(not StarredEvent.objects.filter(event=event2.id))
 
-
     def test_invalid_starred_event_id(self):
 
         url = self.url
@@ -97,7 +90,7 @@ class TestStarredEvent(DjangoTestCase):
         response = self.client.get(url)
         eq_(response.status_code, 200)
 
-        # get the empty list of event ids in json format 
+        # get the empty list of event ids in json format
         structure = json.loads(response.content)
         csrf_token = structure['csrf_token']
         eq_(structure, {'csrf_token': csrf_token, "ids": []})
@@ -111,13 +104,12 @@ class TestStarredEvent(DjangoTestCase):
         eq_(structure, {'csrf_token': csrf_token, "ids": [event1.id]})
 
         # delete event
-        new_event = event1.delete()
+        event1.delete()
         # send updated list to the browser
-        response = self.client.post(url, {'ids[]': structure['ids']})
+        response = self.client.post(url, {'ids': structure['ids']})
         # get the list and verify it was updated
         structure = json.loads(response.content)
         eq_(structure, {'csrf_token': csrf_token, "ids": []})
-
 
     def test_anonymous_user(self):
         # log out user from setUp()

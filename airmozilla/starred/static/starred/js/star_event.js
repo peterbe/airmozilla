@@ -5,6 +5,15 @@ $(function() {
     signedIn = !!$('starred-event').length,
     from_browser = localStorage.getItem('stars');
 
+    // using this just to see what localStorage is storing
+    var i = 0,
+        oJson = {},
+            sKey;
+    for (; sKey = window.localStorage.key(i); i++) {
+            oJson[sKey] = window.localStorage.getItem(sKey);
+    }
+    console.log(oJson);
+
    function triggerClickedStars() {
         $('a.star').each(function(i, element) {
             var $element = $(element);
@@ -19,7 +28,7 @@ $(function() {
        $.getJSON($('starred-event').data('get')).then(function(response) {
            if (response) {
                csrfToken = response.csrf_token;
-               stars.concat(response.ids);
+               stars = stars.concat(response.ids);
                if (csrfToken) {
                   sync();
                }
@@ -58,6 +67,12 @@ $(function() {
       sync();
    }
 
+   $('#nav-main a[href="/starred/"]').on('click', function () {
+        window.location= $(this).attr('href' + '?' + $.param( {
+            'ids': stars
+        }, true));
+        return false;
+   });
 
    $('a.star').on('click', function () {
       toggleArrayPresence($(this).data('id'));
