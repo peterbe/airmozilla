@@ -1,4 +1,3 @@
-from django.core.cache import cache
 from django.db import models
 from django.contrib.auth.models import User
 from airmozilla.main.models import Event
@@ -11,5 +10,3 @@ class StarredEvent(models.Model):
 
     class Meta:
         unique_together = ("event", "user")
-
-

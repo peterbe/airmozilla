@@ -1,10 +1,7 @@
-import json
 import collections
 
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import render
 from django.views.decorators import cache
-from django.core.context_processors import csrf
 from session_csrf import anonymous_csrf
 
 from jsonview.decorators import json_view
@@ -16,6 +13,7 @@ from airmozilla.main.models import (
     Event,
     CuratedGroup,
 )
+
 
 @cache.cache_control(private=True)
 @anonymous_csrf
@@ -47,13 +45,24 @@ def sync_starred_events(request):
 
 def home(request, page=1):
     context = {}
+    events = False
 
-    starred_events_qs = (
-        StarredEvent.objects.filter(user=request.user)
-        .select_related('event')
-        .order_by('-created')
-    )
-    starred_paged = paginate(starred_events_qs, page, 10)
+    if (request.user):
+        ## LOGGED IN USER VIEW
+        events = (
+            Event.objects.filter(starredevent__user=request.user)
+            .order_by('-created')
+        )
+        # END
+    elif request.method == 'POST':
+        ## ANONYMOUS JAVASCRIPT POST
+        ids = request.GET.getlist('ids')
+        print ids
+        events = Event.objects.filter(id__in=ids)
+        print events
+        # END
+
+    starred_paged = paginate(events, page, 10)
 
     # to simplify the complexity of the template when it tries to make the
     # pagination URLs, we just figure it all out here
@@ -72,7 +81,7 @@ def home(request, page=1):
     curated_groups_map = collections.defaultdict(list)
     curated_groups = (
         CuratedGroup.objects.filter(event__in=[
-            x.event.id for x in starred_paged
+            x.id for x in starred_paged
         ])
         .values_list('event_id', 'name')
         .order_by('name')
@@ -83,11 +92,18 @@ def home(request, page=1):
     def get_curated_groups(event):
         return curated_groups_map.get(event.id)
 
-    context= {
-        'starred': starred_paged,
+    context = {
+        'events': starred_paged,
         'get_curated_groups': get_curated_groups,
         'next_page_url': next_page_url,
         'prev_page_url': prev_page_url,
     }
 
-    return render(request, 'starred/home.html', context)
+    if (request.method == 'POST' and not request.user):
+        ## ANONYMOUS JAVASCRIPT POST
+        return render(request, 'starred/events_snippet.html', context)
+    else:
+        ## LOGGED IN USER
+        return render(request, 'starred/home.html', context)
+    # END
+

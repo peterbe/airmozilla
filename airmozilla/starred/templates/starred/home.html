@@ -1,5 +1,5 @@
 {% extends 'main/home.html' %}
-{% set page = page|default('home') -%}
+{% set page = page|default('starred') -%}
 
 {% block page_title %}
 Starred Events | {{ super() }}
@@ -7,11 +7,13 @@ Starred Events | {{ super() }}
 
 {% block content_main %}
 <h2 class="section-title">Starred Events</h2>
-  {% for star in starred %}
-  {{ article_macro(star.event) }}
+<div id="events">
+  {% for event in events %}
+  {{ article_macro(event) }}
   {% endfor %}
 
 {% if next_page_url or prev_page_url %}
 {{ event_paginate(next_page_url, prev_page_url, tags=None) }}
   {% endif %}
+</div>
 {% endblock %}
