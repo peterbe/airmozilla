@@ -7,13 +7,23 @@ Starred Events | {{ super() }}
 
 {% block content_main %}
 <h2 class="section-title">Starred Events</h2>
-<div id="events">
-  {% for event in events %}
-  {{ article_macro(event) }}
-  {% endfor %}
 
-{% if next_page_url or prev_page_url %}
-{{ event_paginate(next_page_url, prev_page_url, tags=None) }}
-  {% endif %}
-</div>
+{% if events %}
+    {% include 'starred/events.html' %}
+{% else %}
+    <div id="events">
+        Please wait. Loading your starred events....
+    </div>
+    <script src="{{ static('starred/js/star_event.js') }}"></script>
+    <script>
+    $(function() {
+        if (stars.length > 0) {
+            $('#events').load('/starred/events', {ids: stars});
+        } else {
+            $('#events').text("Sorry. You have no starred events");
+        }
+    });
+    </script>
+{% endif %}
+
 {% endblock %}
