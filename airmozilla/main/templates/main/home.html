@@ -11,30 +11,6 @@ p.feed { float: right; }
 </style>
 {% endblock %}
 
-{% macro article_macro(event) %}
-{% set href = url('main:event', slug=event.slug) %}
-<article id="event-{{ event.id }}" class="post type-post status-publish format-standard hentry">
-  <header class="entry-header">
-    <h2 class="entry-title">
-      <a href="{{ href }}">{{ event.title }}</a>
-    </h2>
-    {% set curated_groups = get_curated_groups(event) %}
-    {% include 'main/_event_privacy.html' %}
-  </header>
-  <div class="entry-summary">
-    <p class="event-date">{{ event.start_time|js_date }}</p>
-    <a href="{{ href }}">
-      {{ show_thumbnail(event) }}
-    </a>
-    <a class="star" data-id="{{ event.id }}" title="Save to watch later"></a>
-    <p>
-      {{ short_desc(event) | safe_html }}
-      <a class="go" href="{{ href }}">{{ _('See more') }}</a>
-    </p>
-  </div>
-</article>
-{% endmacro %}
-
 {% macro event_paginate(next_page_url, prev_page_url, tags) %}
   <nav class="nav-paging">
     <ul>
@@ -133,11 +109,7 @@ p.feed { float: right; }
   </h2>
   {% endif %}
 
-  {% for event in events %}
-  {{ article_macro(event) }}
-  {% endfor %}
+  {% include 'main/_event.html' %}
+  {% include 'main/_paginate.html' %}
 
-  {% if next_page_url or prev_page_url %}
-  {{ event_paginate(next_page_url, prev_page_url, tags) }}
-  {% endif %}
 {% endblock %}

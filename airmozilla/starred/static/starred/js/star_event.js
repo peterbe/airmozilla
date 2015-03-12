@@ -67,13 +67,6 @@ $(function() {
       sync();
    }
 
-   $('#nav-main a[href="/starred/"]').on('click', function () {
-        window.location= $(this).attr('href' + '?' + $.param( {
-            'ids': stars
-        }, true));
-        return false;
-   });
-
    $('a.star').on('click', function () {
       toggleArrayPresence($(this).data('id'));
       $(this).toggleClass('star-on');

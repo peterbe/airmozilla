@@ -47,50 +47,50 @@ def home(request, page=1):
     context = {}
     events = False
 
-    if (request.user):
+    if (request.user.is_authenticated()):
         ## LOGGED IN USER VIEW
         events = (
-            Event.objects.filter(starredevent__user=request.user)
+            Event.objects.filter(starredevent__user=request.user.id)
             .order_by('-created')
         )
         # END
     elif request.method == 'POST':
-        ## ANONYMOUS JAVASCRIPT POST
+        # ANONYMOUS JAVASCRIPT POST
         ids = request.GET.getlist('ids')
-        print ids
         events = Event.objects.filter(id__in=ids)
-        print events
         # END
 
-    starred_paged = paginate(events, page, 10)
+    starred_paged = next_page_url = prev_page_url = None
+    if events:
+        starred_paged = paginate(events, page, 10)
 
-    # to simplify the complexity of the template when it tries to make the
-    # pagination URLs, we just figure it all out here
-    next_page_url = prev_page_url = None
-    if starred_paged.has_next():
-        next_page_url = reverse(
-            'starred:home',
-            args=(starred_paged.next_page_number(),)
-        )
-    if starred_paged.has_previous():
-        prev_page_url = reverse(
-            'starred:home',
-            args=(starred_paged.previous_page_number(),)
-        )
+        # to simplify the complexity of the template when it tries to make the
+        # pagination URLs, we just figure it all out here
+        if starred_paged.has_next():
+            next_page_url = reverse(
+                'starred:home',
+                args=(starred_paged.next_page_number(),)
+            )
+        if starred_paged.has_previous():
+            prev_page_url = reverse(
+                'starred:home',
+                args=(starred_paged.previous_page_number(),)
+            )
 
-    curated_groups_map = collections.defaultdict(list)
-    curated_groups = (
-        CuratedGroup.objects.filter(event__in=[
-            x.id for x in starred_paged
-        ])
-        .values_list('event_id', 'name')
-        .order_by('name')
-    )
-    for event_id, name in curated_groups:
-        curated_groups_map[event_id].append(name)
+        curated_groups_map = collections.defaultdict(list)
+        curated_groups = (
+            CuratedGroup.objects.filter(event__in=[
+                x.id for x in starred_paged
+            ])
+            .values_list('event_id', 'name')
+            .order_by('name')
+        )
+        for event_id, name in curated_groups:
+            curated_groups_map[event_id].append(name)
 
     def get_curated_groups(event):
-        return curated_groups_map.get(event.id)
+        if events:
+            return curated_groups_map.get(event.id)
 
     context = {
         'events': starred_paged,
@@ -99,9 +99,9 @@ def home(request, page=1):
         'prev_page_url': prev_page_url,
     }
 
-    if (request.method == 'POST' and not request.user):
+    if (request.method == 'POST' and not request.user.id):
         ## ANONYMOUS JAVASCRIPT POST
-        return render(request, 'starred/events_snippet.html', context)
+        return render(request, 'starred/events.html', context)
     else:
         ## LOGGED IN USER
         return render(request, 'starred/home.html', context)

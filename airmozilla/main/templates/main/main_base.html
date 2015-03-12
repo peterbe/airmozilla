@@ -6,7 +6,7 @@
     ('Channels', 'main:channels', 'channels', True, ''),
     ('Calendar', 'main:calendar', 'calendar', True, ''),
     ('Tag Cloud', 'main:tag_cloud', 'tag_cloud', True, ''),
-    ('Starred', 'starred:home', 'starred', request.user.is_active, ''),
+    ('Starred', 'starred:home', 'starred', True, ''),
     ('Requests', 'suggest:start', 'suggest', request.user.is_active, ''),
     ('Management', 'manage:events', '', request.user.is_staff, ''),
     ('Sign out', '/browserid/logout/', '', request.user.is_active, 'browserid-logout'),
@@ -61,7 +61,7 @@ Air Mozilla | Mozilla, in Video
       </ul>
     </nav>
           {% if request.user.is_authenticated() %}
-          <starred-event data-get="{{ url('starred:sync') }}" data-post="{{ url('starred:sync') }}" />
+          <starred-event data-get="{{ url('starred:sync') }}" data-post="{{ url('starred:sync') }}" ></starred-event>
           {% endif %}
     {% block banner %}
       {% include 'main/_banner_small.html' %}
