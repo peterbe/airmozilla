@@ -11,26 +11,6 @@ p.feed { float: right; }
 </style>
 {% endblock %}
 
-{% macro event_paginate(next_page_url, prev_page_url, tags) %}
-  <nav class="nav-paging">
-    <ul>
-      {% if next_page_url %}
-        <li class="prev">
-          <a href="{{ next_page_url }}{% if tags %}?{{ tags_query_string(tags) }}{% endif %}">
-            {{ _('Older videos') }}
-          </a>
-        </li>
-      {% endif %}
-      {% if prev_page_url %}
-        <li class="next">
-          <a href="{{ prev_page_url }}{% if tags %}?{{ tags_query_string(tags) }}{% endif %}">
-            {{ _('Newer videos') }}
-          </a>
-        </li>
-      {% endif %}
-    </ul>
-  </nav>
-  {% endmacro %}
 
 {% block content_main %}
   {% if front_page %}
@@ -109,7 +89,7 @@ p.feed { float: right; }
   </h2>
   {% endif %}
 
-  {% include 'main/_event.html' %}
+  {% include 'main/_events.html' %}
   {% include 'main/_paginate.html' %}
 
 {% endblock %}

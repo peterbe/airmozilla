@@ -8,7 +8,7 @@ from jsonview.decorators import json_view
 from funfactory.urlresolvers import reverse
 
 from airmozilla.base.utils import paginate
-from airmozilla.starred.models import StarredEvent, Event
+from airmozilla.starred.models import StarredEvent
 from airmozilla.main.models import (
     Event,
     CuratedGroup,
@@ -44,21 +44,21 @@ def sync_starred_events(request):
 
 
 def home(request, page=1):
-    context = {}
-    events = False
+    template_name = 'starred/home.html'
+    ids = request.GET.getlist('ids')
 
-    if (request.user.is_authenticated()):
-        ## LOGGED IN USER VIEW
+    if ids:
+        # how do we order_by the order in ids?
+        events = Event.objects.filter(id__in=ids).order_by('-created')
+        template_name = 'starred/events.html'
+
+    elif request.user.is_authenticated():
         events = (
             Event.objects.filter(starredevent__user=request.user.id)
-            .order_by('-created')
+            .order_by('-starredevent__created')
         )
-        # END
-    elif request.method == 'POST':
-        # ANONYMOUS JAVASCRIPT POST
-        ids = request.GET.getlist('ids')
-        events = Event.objects.filter(id__in=ids)
-        # END
+    else:
+        events = None
 
     starred_paged = next_page_url = prev_page_url = None
     if events:
@@ -99,11 +99,4 @@ def home(request, page=1):
         'prev_page_url': prev_page_url,
     }
 
-    if (request.method == 'POST' and not request.user.id):
-        ## ANONYMOUS JAVASCRIPT POST
-        return render(request, 'starred/events.html', context)
-    else:
-        ## LOGGED IN USER
-        return render(request, 'starred/home.html', context)
-    # END
-
+    return render(request, template_name, context)

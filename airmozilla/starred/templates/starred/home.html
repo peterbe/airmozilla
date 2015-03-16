@@ -14,16 +14,23 @@ Starred Events | {{ super() }}
     <div id="events">
         Please wait. Loading your starred events....
     </div>
-    <script src="{{ static('starred/js/star_event.js') }}"></script>
+{% endif %}
+
+{% endblock %}
+{% block site_js %}
+{{ super() }}
     <script>
     $(function() {
-        if (stars.length > 0) {
-            $('#events').load('/starred/events', {ids: stars});
+    if (Stars.getStars().length) {
+            $('#events').load(window.location + '',
+                $.param({ids: Stars.getStars()}, true),
+                function () {
+                    Stars.triggerClickedStars();
+                }
+            );
         } else {
             $('#events').text("Sorry. You have no starred events");
         }
     });
     </script>
-{% endif %}
-
 {% endblock %}

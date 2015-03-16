@@ -11,15 +11,6 @@ from airmozilla.starred.models import (
 
 class TestStarredEvent(DjangoTestCase):
     fixtures = ['airmozilla/manage/tests/main_testdata.json']
-# test that a starred event can be synced
-# test that an unstarred event can be synced
-# test that unchanged events remain that way
-# test that unknown event id does the right thing (whatever that is)
-# test that the proper list is returned from a get
-# test that the proper list of starred events is displayed
-# add star, sync 
-# remove star, add different star, sync
-# test what happens when a user isn't logged in
 
     def setUp(self):
         super(TestStarredEvent, self).setUp()
