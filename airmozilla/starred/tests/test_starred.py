@@ -18,7 +18,7 @@ class TestStarredEvent(DjangoTestCase):
         # create the url
         self.url = reverse('starred:sync')
         # so, let's sign in
-        self.user =  self._login(username='lisa')
+        self.user = self._login(username='lisa')
 
     def create_event(self, title):
         # instantiate test event
