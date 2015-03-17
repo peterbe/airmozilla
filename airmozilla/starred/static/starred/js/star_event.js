@@ -25,7 +25,7 @@ var Stars = (function() {
    }
 
     return {
-        
+
         getStars: function () {
             return stars;
         },
@@ -89,7 +89,7 @@ $(function() {
     console.log(oJson);
 
 
-   $('a.star').on('click', function () {
+   $('#content').on('click', 'a.star', function () {
       Stars.toggleArrayPresence($(this).data('id'));
       $(this).toggleClass('star-on');
    });
