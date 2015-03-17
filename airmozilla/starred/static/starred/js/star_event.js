@@ -43,6 +43,7 @@ var Stars = (function() {
                     if (response) {
                         csrfToken = response.csrf_token;
                         stars = response.ids;
+                        stars = stars.slice(0, 500);
                         localStorage.setItem('stars', JSON.stringify(stars));
                         Stars.triggerClickedStars();
                     }
@@ -65,8 +66,9 @@ var Stars = (function() {
             if (index > -1) {
                 stars.splice(index, 1);
             } else {
-                stars.push(id);
+                stars.unshift(id);
             }
+            stars = stars.slice(0, 500);
             localStorage.setItem('stars', JSON.stringify(stars));
             if (signedIn) {
                 Stars.sync();
