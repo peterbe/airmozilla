@@ -12,15 +12,21 @@ var Stars = (function() {
         }
 
         if (signedIn) {
-            $.getJSON($('starred-event').data('get')).then(function(response) {
-                if (response) {
-                    csrfToken = response.csrf_token;
-                    stars = stars.concat(response.ids);
-                    if (csrfToken) {
-                        Stars.sync();
-                    }
-                }
-            });
+            // then the <starred-event> tag would have the list of ids
+            var serverStars = [];
+            var ids = $('starred-event').data('ids');
+            if (ids.length) {
+                ids.split(',').forEach(function(id) {
+                    serverStars.push(parseInt(id, 10));
+                });
+            }
+            console.log('serverStats', serverStars);
+            csrfToken = $('starred-event input[name="csrfmiddlewaretoken"]').val();
+            // jquery array comparison http://stackoverflow.com/a/7726509/205832
+            if ($(stars).not(serverStars).length === 0 &&
+                $(serverStars).not(stars).length === 0) {
+                Stars.sync();
+            }
         }
    }
 
@@ -33,8 +39,7 @@ var Stars = (function() {
         sync: function () {
             if (!csrfToken) {
                 return initialSync();
-            }
-            if (signedIn) {
+            } else if (signedIn) {
                 $.post($('starred-event').data('post'), $.param( {
                     'ids': stars,
                     'csrfmiddlewaretoken': csrfToken

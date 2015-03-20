@@ -60,9 +60,11 @@ Air Mozilla | Mozilla, in Video
           {% endif %}
       </ul>
     </nav>
-          {% if request.user.is_authenticated() %}
-          <starred-event data-get="{{ url('starred:sync') }}" data-post="{{ url('starred:sync') }}" ></starred-event>
-          {% endif %}
+    {% if request.user.is_authenticated() %}
+      <starred-event data-post="{{ url('starred:sync') }}"
+        data-ids="{{ star_ids }}">{{ csrf() }}
+      </starred-event>
+    {% endif %}
     {% block banner %}
       {% include 'main/_banner_small.html' %}
     {% endblock %}
