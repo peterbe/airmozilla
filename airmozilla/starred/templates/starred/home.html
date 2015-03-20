@@ -12,7 +12,8 @@ Starred Events | {{ super() }}
     {% include 'starred/events.html' %}
 {% else %}
     <div id="events">
-        Please wait. Loading your starred events....
+        <p class="has-stars">Please wait. Loading your starred events...</p>
+        <p class="no-stars" style="display:none">You have no starred events. Yet.</p>
     </div>
 {% endif %}
 
@@ -22,14 +23,12 @@ Starred Events | {{ super() }}
     <script>
     $(function() {
     if (Stars.getStars().length) {
-            $('#events').load(window.location + '',
-                $.param({ids: Stars.getStars()}, true),
-                function () {
-                    Stars.triggerClickedStars();
-                }
-            );
+            $('#events')
+                .load(window.location + '?ids=' + Stars.getStars().join(','),
+                     Stars.triggerClickedStars);
         } else {
-            $('#events').text("Sorry. You have no starred events");
+            $('#events .has-stars').hide();
+            $('#events .no-stars').show();
         }
     });
     </script>

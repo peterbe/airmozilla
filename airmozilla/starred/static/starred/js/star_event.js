@@ -2,7 +2,7 @@ var Stars = (function() {
     var stars = [],
         csrfToken, signedIn;
 
-   function initialSync() {
+    function initialSync() {
         signedIn = !!$('starred-event').length;
         var fromBrowser = localStorage.getItem('stars');
 
@@ -89,10 +89,11 @@ $(function() {
     console.log(oJson);
 
 
-   $('#content').on('click', 'a.star', function () {
-      Stars.toggleArrayPresence($(this).data('id'));
-      $(this).toggleClass('star-on');
-   });
+    $('#content').on('click', 'a.star', function () {
+        var id = $(this).data('id');
+        Stars.toggleArrayPresence(id);
+        $('a.star[data-id=' + id + ']').toggleClass('star-on');
+    });
 
-   Stars.sync();
+    Stars.sync();
 });

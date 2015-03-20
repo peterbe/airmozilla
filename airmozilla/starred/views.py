@@ -45,9 +45,10 @@ def sync_starred_events(request):
 
 def home(request, page=1):
     template_name = 'starred/home.html'
-    ids = request.GET.getlist('ids')
+    ids = request.GET.get('ids')
 
     if ids:
+        ids = [int(x) for x in ids.split(',')]
         # how do we order_by the order in ids?
         events = Event.objects.filter(id__in=ids).order_by('-created')
         template_name = 'starred/events.html'
@@ -55,7 +56,7 @@ def home(request, page=1):
     elif request.user.is_authenticated():
         events = (
             Event.objects.filter(starredevent__user=request.user.id)
-            .order_by('-starredevent__created')
+            .order_by('starredevent__created')
         )
     else:
         events = None

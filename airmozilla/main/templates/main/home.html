@@ -1,5 +1,5 @@
 {% extends 'main/main_base.html' %}
-{% set front_page = (events and events.number == 1) %}
+{% set front_page = (events.number == 1) %}
 
 {% block body_class %}with-sidebar{% endblock %}
 
@@ -32,7 +32,7 @@ p.feed { float: right; }
       <div class="entry-summary">
         <a href="{{ href }}">
           {{ show_thumbnail(live, '160x90') }}
-        <a class="star live" data-id="{{ event.id }}" title="Save to watch later"></a>
+        <a class="star live" data-id="{{ event.id }}" title="Save as a starred event"></a>
         </a>
         <p>{{ short_desc(live, 16) | safe_html }}
         <a class="go" href="{{ href }}">{{_('See more') }}</a></p>
