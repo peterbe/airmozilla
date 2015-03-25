@@ -5,7 +5,9 @@ var Stars = (function() {
 
         function sync() {
             if (!signedIn) {
-                if (postSyncCallback) { postSyncCallback() }
+                if (postSyncCallback) {
+                    postSyncCallback();
+                }
             }
             else {
                 $.post($('starred-event').data('post'), $.param( {
@@ -18,7 +20,9 @@ var Stars = (function() {
                         stars = response.ids;
                         stars = stars.slice(0, 500);
                         localStorage.setItem('stars', JSON.stringify(stars));
-                        if (postSyncCallback) { postSyncCallback() }
+                        if (postSyncCallback) {
+                            postSyncCallback();
+                        }
                     }
                 });
             }
