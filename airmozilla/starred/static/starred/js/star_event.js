@@ -64,8 +64,8 @@ var Stars = (function() {
                 }
                 csrfToken = $('starred-event input[name="csrfmiddlewaretoken"]').val();
                 // jquery array comparison http://stackoverflow.com/a/7726509/205832
-                if ($(stars).not(serverStars).length === 0 &&
-                    $(serverStars).not(stars).length === 0) {
+                if (!($(stars).not(serverStars).length === 0 &&
+                      $(serverStars).not(stars).length === 0)) {
                     sync();
                 }
             }
