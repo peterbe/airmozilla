@@ -5,7 +5,7 @@ from funfactory.urlresolvers import reverse
 from nose.tools import eq_, ok_
 
 from airmozilla.base.tests.testbase import DjangoTestCase
-from airmozilla.main.models import Event
+from airmozilla.main.models import Event, CuratedGroup
 from airmozilla.starred.models import (
     StarredEvent,
 )
@@ -167,6 +167,32 @@ class TestStarredEvent(DjangoTestCase):
         ok_(event1.title in response.content)
         ok_(event2.title in response.content)
         ok_(event3.title not in response.content)
+
+    def test_display_starred_events_belonging_to_curated_groups(self):
+        url = self.home_url
+
+        user = self._login(username='lisa')
+        event = self.create_event('Test Event 1')
+        event.privacy = Event.PRIVACY_CONTRIBUTORS
+        event.save()
+        CuratedGroup.objects.create(
+            event=event,
+            name='Some Curated Group'
+        )
+        StarredEvent.objects.create(user=user, event=event)
+
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        ok_(event.title in response.content)
+        ok_('Some Curated Group' in response.content)
+
+        # load page with an AJAX GET
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        eq_(response.status_code, 200)
+
+        # verify correct events are displayed
+        ok_(event.title in response.content)
+        ok_('Some Curated Group' in response.content)
 
     def test_anonymous_starred_events(self):
 
