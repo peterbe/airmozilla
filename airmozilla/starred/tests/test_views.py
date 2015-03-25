@@ -13,11 +13,17 @@ from airmozilla.starred.models import (
 
 class TestStarredEvent(DjangoTestCase):
     fixtures = ['airmozilla/manage/tests/main_testdata.json']
+    main_image = 'airmozilla/manage/tests/firefox.png'
     sync_url = reverse('starred:sync')
     home_url = reverse('starred:home')
 
     def setUp(self):
         super(TestStarredEvent, self).setUp()
+
+        # The event we're going to clone needs to have a real image
+        # associated with it so it can be rendered.
+        event = Event.objects.get(title='Test event')
+        self._attach_file(event, self.main_image)
 
     def create_event(self, title):
         # instantiate test event
@@ -30,6 +36,7 @@ class TestStarredEvent(DjangoTestCase):
             slug='event' + str(event_count),
             description=event.description,
             start_time=event.start_time,
+            archive_time=event.archive_time,
             privacy=Event.PRIVACY_PUBLIC,
             placeholder_img=event.placeholder_img,
             location=event.location,
