@@ -95,3 +95,62 @@ p.pending {
 .playbackrate .options a.current {
     color: white;
 }
+.tabs{
+    position: relative;
+    min-height: 200px;
+    clear: both;
+    margin: 25px 0;
+}
+.tabs {
+  position: relative;
+  min-height: 200px; /* This part sucks */
+  clear: both;
+  margin: 25px 0;
+}
+.tab {
+      float: left;
+}
+.tab label {
+      background: #20272a;
+      padding: 5px;
+      border: none;
+      margin-left: 0px;
+      position: relative;
+      left: 1px;
+}
+.tab [type=radio] {
+      display: none;
+}
+.content {
+  position: absolute;
+  top: 28px;
+  left: 0;
+  background: #2d373b;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  overflow: hidden;
+}
+
+.content > * {
+      opacity: 0;
+
+}
+
+[type=radio]:checked ~ label {
+      background: #2d373b;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      z-index: 2;
+}
+
+[type=radio]:checked ~ label ~ .content {
+      z-index: 1;
+}
+
+[type=radio]:checked ~ label ~ .content > * {
+      opacity: 1;
+      
+}
