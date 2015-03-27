@@ -111,12 +111,15 @@ p.pending {
       float: left;
 }
 .tab label {
-      background: #20272a;
-      padding: 5px;
+      background: #273032;
+      padding: 5px 10px;
       border: none;
       margin-left: 0px;
       position: relative;
-      left: 1px;
+      left: 0;
+      border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
+      margin-right: 4px;
 }
 .tab [type=radio] {
       display: none;
@@ -152,5 +155,5 @@ p.pending {
 
 [type=radio]:checked ~ label ~ .content > * {
       opacity: 1;
-      
+
 }

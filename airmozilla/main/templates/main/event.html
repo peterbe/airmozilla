@@ -149,9 +149,9 @@
           {{ event.additional_links | urlize|nl2br }}
         </div>
       </div>
-      {% endif %} 
+      {% endif %}
 
-      
+
       {% if tags %}
       <div class="tab">
         <input type="radio" id="tags" name="tab-group-1" checked>
@@ -204,7 +204,7 @@
         <div class="tab">
           <input type="radio" id="embed" name="tab-group-1">
           <label for="embed">Embed</label>
-          <div class="content">
+          <div class="content embed">
             <a href="#" class="current">Small (640x380)</a>
             <br>
             <textarea rows="1" cols="80" class="small-embed-code">{{ embed_code }}</textarea>
