@@ -22,6 +22,7 @@ urlpatterns = patterns(
     (r'^uploads/', include('airmozilla.uploads.urls', namespace='uploads')),
     (r'^roku/', include('airmozilla.roku.urls', namespace='roku')),
     (r'^mozshorts/', include('airmozilla.webrtc.urls', namespace='webrtc')),
+    (r'^ionair/', include('airmozilla.ionair.urls', namespace='ionair')),
     ('^(?P<path>favicon\.ico)$', 'django.views.static.serve',
      {'document_root': settings.ROOT + '/airmozilla/base/static/img'}),
     (r'', include('django_browserid.urls')),

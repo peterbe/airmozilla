@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     '%s.cronlogger' % PROJECT_MODULE,
     '%s.webrtc' % PROJECT_MODULE,
     '%s.staticpages' % PROJECT_MODULE,
+    '%s.ionair' % PROJECT_MODULE,
 
     'bootstrapform',
     'sorl.thumbnail',
