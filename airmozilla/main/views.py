@@ -6,8 +6,6 @@ import time
 import collections
 import pyelasticsearch
 
-from pprint import pprint
-
 from django import http
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
@@ -515,17 +513,16 @@ def es_to_template(self, request, slug):
         )
 
     es.refresh()  # let it clear its throat
-  
+
     hits = es.search('title: firefox', index='events')['hits']
     ids = []
     for doc in hits['hits']:
-        events.objects.get(
         ids.append(doc['_id'])
     events = Event.objects.filter(id__in=ids)
     events.sort(lambda e: ids.index(e.id))
 
     context = {
-        'events':events,
+        'events': events,
     }
     return render(request, 'main/es.html', context)
 
