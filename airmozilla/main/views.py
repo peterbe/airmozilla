@@ -501,7 +501,7 @@ class EventView(View):
 
 def es_to_template(self, request, slug):
     es = pyelasticsearch.ElasticSearch('http://localhost:9200/')
-    for event in Event.objects.scheduled().order_by('?')[:100]:
+    for event in Event.objects.scheduled():
         # should do bulk ops really but besides the point
         es.index(
             'events',
@@ -515,28 +515,20 @@ def es_to_template(self, request, slug):
         )
 
     es.refresh()  # let it clear its throat
-    print '-' * 100
-
-    # get one my id
-    event, = Event.objects.scheduled().order_by('?')[:1]
-    try:
-        doc = es.get('events', 'event', event.id)
-        pprint(doc['_source'])
-        assert doc['_source']['title'] == event.title
-    except pyelasticsearch.exceptions.ElasticHttpNotFoundError:
-        print "Not indexed yet :("
-
-    print '-' * 100
+  
     hits = es.search('title: firefox', index='events')['hits']
+    ids = []
     for doc in hits['hits']:
-        event = Event.objects.get(id=doc['_id'])
-        print "\t", repr(event.title), doc['_score']
-   
-    template_name = 'main/es.html'
-    ids = [int(x) for x in id.split(',')]
+        events.objects.get(
+        ids.append(doc['_id'])
     events = Event.objects.filter(id__in=ids)
-    return render(request, template_name, events)
-    
+    events.sort(lambda e: ids.index(e.id))
+
+    context = {
+        'events':events,
+    }
+    return render(request, 'main/es.html', context)
+
     def post(self, request, slug):
         event = get_object_or_404(Event, slug=slug)
         pin_form = forms.PinForm(request.POST, instance=event)
