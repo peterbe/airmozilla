@@ -1,0 +1,25 @@
+<!-- This is a kind of draft mode and probably has way too much info than needed, is this suppose to be at event.html? -->
+<div>
+<h2 class="section-title">{{ _('Related Events') }}</h2>
+      {% else %}
+        {% if channel.image and channel.image_is_banner %}
+          {% set thumb = thumbnail(channel.image, '650') %}
+          <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+               alt="{{ channel.name }}" class="channel-banner">
+          <p class="feed"><a href="{{ url('main:channel_feed', channel.slug, feed_privacy) }}">Feed</a></p>
+        {% else %}
+          <p class="feed"><a href="{{ url('main:channel_feed', channel.slug, feed_privacy) }}">Feed</a></p>
+          {% if channel.image %}
+            {% set thumb = thumbnail(channel.image, '100x100') %}
+            <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+                 alt="{{ channel.name }}" class="channel-thumbnail">
+          {% endif %}
+            <h2 class="section-title">{{ channel.name }}</h2>
+        {% endif %}
+        {% if channel.description %}
+        <div class="channel-description">
+        {{ channel.description|safe }}
+        </div>
+        {% endif %}
+</div>
+
