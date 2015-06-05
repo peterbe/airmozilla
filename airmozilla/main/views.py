@@ -499,21 +499,6 @@ class EventView(View):
 
 def es_to_template(self, request, slug):
     es = pyelasticsearch.ElasticSearch('http://localhost:9200/')
-    for event in Event.objects.scheduled():
-        # should do bulk ops really but besides the point
-        es.index(
-            'events',
-            'event',
-            {
-                'title': event.title,
-                'tags': [x.name for x in event.tags.all()],
-                'channels': [x.name for x in event.channels.all()],
-            },
-            id=event.id,
-        )
-
-    es.refresh()  # let it clear its throat
-
     hits = es.search('title: firefox', index='events')['hits']
     ids = []
     for doc in hits['hits']:
