@@ -496,7 +496,6 @@ class EventView(View):
 
         return render(request, self.template_name, context)
 
-
     def es_to_template(self, request, slug):
         es = pyelasticsearch.ElasticSearch('http://localhost:9200/')
         hits = es.search('title: firefox', index='events')['hits']
