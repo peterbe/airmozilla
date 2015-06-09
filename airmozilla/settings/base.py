@@ -334,3 +334,8 @@ GOD_MODE = False
 # If you want to disable all of the browser ID stuff, set this to True.
 # That means you won't be able to sign in at all. Or sign out.
 BROWSERID_DISABLED = False
+
+
+# This is here in order to override the code related to elastic search
+# once things are said and done, ie. it works, this will be deleted
+USE_RELATED_CONTENT = False

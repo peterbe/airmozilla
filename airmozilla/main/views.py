@@ -496,20 +496,6 @@ class EventView(View):
 
         return render(request, self.template_name, context)
 
-    def es_to_template(self, request, slug):
-        es = pyelasticsearch.ElasticSearch('http://localhost:9200/')
-        hits = es.search('title: firefox', index='events')['hits']
-        ids = []
-        for doc in hits['hits']:
-            ids.append(doc['_id'])
-        events = Event.objects.filter(id__in=ids)
-        events.sort(lambda e: ids.index(e.id))
-
-        context = {
-            'events': events,
-        }
-        return render(request, 'main/es.html', context)
-
     def post(self, request, slug):
         event = get_object_or_404(Event, slug=slug)
         pin_form = forms.PinForm(request.POST, instance=event)
@@ -1127,6 +1113,21 @@ class EventsFeed(Feed):
 
     def item_pubdate(self, event):
         return event.start_time
+
+
+def es_to_template(self, request, slug):
+    es = pyelasticsearch.ElasticSearch('http://localhost:9200/')
+    hits = es.search('title: firefox', index='events')['hits']
+    ids = []
+    for doc in hits['hits']:
+        ids.append(doc['_id'])
+    events = Event.objects.filter(id__in=ids)
+    events.sort(lambda e: ids.index(e.id))
+
+    context = {
+        'events': events,
+    }
+    return render(request, 'main/es.html', context)
 
 
 def channels(request):
