@@ -1115,8 +1115,8 @@ class EventsFeed(Feed):
         return event.start_time
 
 
-def es_to_template(self, request, slug):
-    es = pyelasticsearch.ElasticSearch('http://localhost:9200/')
+def related_content(self, request, slug):
+    es = pyelasticsearch.ElasticSearch(settings.RELATED_CONTENT_URL)
     hits = es.search('title: firefox', index='events')['hits']
     ids = []
     for doc in hits['hits']:

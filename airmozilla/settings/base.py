@@ -224,6 +224,9 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 # Always use secure cookies
 COOKIES_SECURE = True
 
+#Default for related content
+RELATED_CONTENT_URL = 'http://localhost:9200/'
+
 # Defaults for Mozillians
 MOZILLIANS_API_BASE = 'https://mozillians.org'
 
