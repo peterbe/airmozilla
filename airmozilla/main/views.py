@@ -1122,18 +1122,20 @@ def related_content(self, request, slug):
     for doc in hits['hits']:
         ids.append(doc['_id'])
 
-    if self.privacy == Event.PRIVACY_PRIVATE:
-        events = Event.objects \
-                      .filter(id__in=ids) \
-                      .filter(privacy=Event.PRIVACY_PRIVATE)
-        if self.privacy == Event.PRIVACY_CONTRIBUTORS:
+    if request.user.is_active:
+        if is_contributor(request.user):
+            events = Event.objects \
+                          .exclude(Q(privacy=Event.PRIVACY_PUBLIC)
+                                   |
+                                   Q(Event.PRIVACY_CONTRIBUTORS)) \
+                          .filter(id__in=ids) \
+                          .filter(privacy=Event.PRIVACY_PRIVATE)
+        else:
+            events = Event.objects.filter(id__in=ids)
+    elif not request.user.is_active:
             events = Event.objects \
                           .filter(id__in=ids) \
-                          .filter(privacy=Event.PRIVACY_CONTRIBUTORS)
-    elif self.privacy == Event.Event.PRIVACY_PUBLIC:
-        events = Event.objects \
-                      .filter(id__in=ids) \
-                      .filter(privacy=Event.PRIVACY_PUBLIC)
+                          .filter(privacy=Event.PRIVACY_PUBLIC)
 
     events.sort(lambda e: ids.index(e.id))
 

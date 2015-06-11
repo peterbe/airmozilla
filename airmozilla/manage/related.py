@@ -15,7 +15,7 @@ def indexing(self):
                 'title': event.title,
                 'tags': [x.name for x in event.tags.all()],
                 'channels': [x.name for x in event.channels.all()],
-                'privacy': [x.name for x in event.privacy.all()],
             },
             id=event.id,
+            privacy=event.privacy,
         )
