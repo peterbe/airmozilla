@@ -1127,7 +1127,7 @@ def related_content(self, request, slug):
             events = Event.objects \
                           .exclude(Q(privacy=Event.PRIVACY_PUBLIC)
                                    |
-                                   Q(Event.PRIVACY_CONTRIBUTORS)) \
+                                   Q(privacy=Event.PRIVACY_CONTRIBUTORS)) \
                           .filter(id__in=ids) \
                           .filter(privacy=Event.PRIVACY_PRIVATE)
         else:
