@@ -6,7 +6,7 @@ from airmozilla.main.models import *
 def indexing(self):
     es.refresh()
     es = pyelasticsearch.ElasticSearch(settings.RELATED_CONTENT_URL)
-    for event in Event.objects.scheduled():
+    for event in Event.objects.scheduled_or_processing():
         # should do bulk ops
         es.index(
             'events',

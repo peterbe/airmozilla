@@ -1115,8 +1115,8 @@ class EventsFeed(Feed):
         return event.start_time
 
 
-def related_content(self, request, slug):
-    event = self.get_event(slug, request)
+def related_content(request, slug):
+    event = get_object_or_404(Event, slug=slug)
 
     if request.user.is_active:
         if is_contributor(request.user):
@@ -1131,19 +1131,8 @@ def related_content(self, request, slug):
                 },
                 "filter": {
                     "not": {
-                        "filter": {
-                            "or": [
-                                {
-                                    "term": {
-                                        "privacy": "Event.PRIVACY_PUBLIC"
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "privacy": "Event.PRIVACY_CONTRIBUTORS"
-                                    }
-                                }
-                            ]
+                        "term": {
+                            "privacy": Event.PRIVACY_COMPANY
                         }
                     }
                 }
@@ -1173,7 +1162,7 @@ def related_content(self, request, slug):
                 "and": {
                     "filter": {
                         "term": {
-                            "privacy": "Event.PRIVACY_PUBLIC"
+                            "privacy": Event.PRIVACY_PUBLIC
                         }
                     }
                 }
@@ -1185,23 +1174,17 @@ def related_content(self, request, slug):
     ids = []
     for doc in hits['hits']:
         ids.append(doc['_id'])
-
+    
+    events = {}
     if request.user.is_active:
         if is_contributor(request.user):
-            events = Event.objects \
-                          .exclude(Q(privacy=Event.PRIVACY_PUBLIC)
-                                   |
-                                   Q(privacy=Event.PRIVACY_CONTRIBUTORS)) \
-                          .filter(id__in=ids) \
-                          .filter(privacy=Event.PRIVACY_PRIVATE)
-        else:
-            events = Event.objects.filter(id__in=ids)
+           events = Event.objects \
+                          .exclude(Event.PRIVACY_COMPANY) \
+                          .filter(id__in=ids)
     else:
-            events = Event.objects \
-                          .filter(id__in=ids) \
-                          .filter(privacy=Event.PRIVACY_PUBLIC)
-
-    events.sort(lambda e: ids.index(e.id))
+        events = Event.objects \
+                      .exlude(privacy=Event.PRIVACY_PRIVATE) \
+                      .filter(id__in=ids)
 
     context = {
         'events': events,
