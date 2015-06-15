@@ -1116,8 +1116,72 @@ class EventsFeed(Feed):
 
 
 def related_content(self, request, slug):
+    event = self.get_event(slug, request)
+
+    if request.user.is_active:
+        if is_contributor(request.user):
+            query = {
+                "query": {
+                    "more_like_this": {
+                        "fields": ["title"],
+                        "like_text": event.title,
+                        "min_term_freq": 1,
+                        "max_query_terms": 5,
+                    }
+                },
+                "filter": {
+                    "not": {
+                        "filter": {
+                            "or": [
+                                {
+                                    "term": {
+                                        "privacy": "Event.PRIVACY_PUBLIC"
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "privacy": "Event.PRIVACY_CONTRIBUTORS"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        else:
+            query = {
+                "query": {
+                    "more_like_this": {
+                        "fields": ["title"],
+                        "like_text": event.title,
+                        "min_term_freq": 1,
+                        "max_query_terms": 5,
+                    }
+                }
+            }
+    else:
+        query = {
+            "query": {
+                "more_like_this": {
+                    "fields": ["title"],
+                    "like_text": event.title,
+                    "min_term_freq": 1,
+                    "max_query_terms": 5,
+                }
+            },
+            "filter": {
+                "and": {
+                    "filter": {
+                        "term": {
+                            "privacy": "Event.PRIVACY_PUBLIC"
+                        }
+                    }
+                }
+            }
+        }
+
     es = pyelasticsearch.ElasticSearch(settings.RELATED_CONTENT_URL)
-    hits = es.search('title: firefox', index='events')['hits']
+    hits = es.search(query, index='events')['hits']
     ids = []
     for doc in hits['hits']:
         ids.append(doc['_id'])
@@ -1132,7 +1196,7 @@ def related_content(self, request, slug):
                           .filter(privacy=Event.PRIVACY_PRIVATE)
         else:
             events = Event.objects.filter(id__in=ids)
-    elif not request.user.is_active:
+    else:
             events = Event.objects \
                           .filter(id__in=ids) \
                           .filter(privacy=Event.PRIVACY_PUBLIC)
