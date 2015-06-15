@@ -1174,11 +1174,11 @@ def related_content(request, slug):
     ids = []
     for doc in hits['hits']:
         ids.append(doc['_id'])
-    
+
     events = {}
     if request.user.is_active:
         if is_contributor(request.user):
-           events = Event.objects \
+            events = Event.objects \
                           .exclude(Event.PRIVACY_COMPANY) \
                           .filter(id__in=ids)
     else:
