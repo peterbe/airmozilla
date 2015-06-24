@@ -8,6 +8,7 @@ from nose.tools import eq_, ok_
 
 from funfactory.urlresolvers import reverse
 
+
 class TestPopcornEvent(DjangoTestCase):
     fixtures = ['airmozilla/manage/tests/main_testdata.json']
     main_image = 'airmozilla/manage/tests/firefox.png'

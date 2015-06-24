@@ -46,4 +46,3 @@ def event_meta_data(request):
         'preview_img': thumb.url,
         'video_url': r.headers['location'],
     }
-
