@@ -8,6 +8,17 @@ from airmozilla.main.helpers import thumbnail
 from airmozilla.main.models import Event, VidlySubmission
 
 
+def add_cors_header(value):
+    def decorator(f):
+        def inner(*args, **kwargs):
+            response = f(*args, **kwargs)
+            response['Access-Control-Allow-Origin'] = value
+            return response
+        return inner
+    return decorator
+
+
+@add_cors_header('*')
 @json_view
 def event_meta_data(request):
     slug = request.GET.get('slug')

@@ -49,3 +49,4 @@ class TestPopcornEvent(DjangoTestCase):
         eq_(content['description'], 'sadfasdf')
         eq_(content['title'], self.title)
         eq_(content['video_url'], self.location)
+        eq_(response['Access-Control-Allow-Origin'], '*')
