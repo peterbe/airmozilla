@@ -1117,23 +1117,9 @@ class EventsFeed(Feed):
 
 def related_content(request, slug):
     event = get_object_or_404(Event, slug=slug)
-    
-    
+
     es = pyelasticsearch.ElasticSearch(settings.RELATED_CONTENT_URL)
     es.refresh()
-    for event in Event.objects.scheduled_or_processing():
-        # should do bulk ops
-        es.index(
-            'events',
-            'event',
-            {
-                'title': event.title,
-                'tags': [x.name for x in event.tags.all()],
-                'channels': [x.name for x in event.channels.all()],
-            },
-            id=event.id,
-
-        )
 
     if request.user.is_active:
         if is_contributor(request.user):
@@ -1142,8 +1128,13 @@ def related_content(request, slug):
                     "filtered": {
                         "query": {
                             "more_like_this": {
-                                "fields": ["title"],
-                                "like_text": event.title,
+                                "fields": ["tags", "title", "channels"],
+                                "docs": [
+                                    {
+                                        "_index": "events",
+                                        "_type": "event",
+                                        "_id": event.id
+                                    }],
                                 "min_term_freq": 1,
                                 "max_query_terms": 5,
                             }
@@ -1162,8 +1153,13 @@ def related_content(request, slug):
             query = {
                 "query": {
                     "more_like_this": {
-                        "fields": ["title"],
-                        "like_text": event.title,
+                        "fields": ["tags", "title", "channels"],
+                        "docs": [
+                            {
+                                "_index": "events",
+                                "_type": "event",
+                                "_id": event.id
+                            }],
                         "min_term_freq": 1,
                         "max_query_terms": 5,
                     }
@@ -1175,8 +1171,13 @@ def related_content(request, slug):
                 "filtered": {
                     "query": {
                         "more_like_this": {
-                            "fields": ["title"],
-                            "like_text": event.title,
+                            "fields": ["tags", "title", "channels"],
+                            "docs": [
+                                {
+                                    "_index": "events",
+                                    "_type": "event",
+                                    "_id": event.id
+                                }],
                             "min_term_freq": 1,
                             "max_query_terms": 5,
                         }
@@ -1184,49 +1185,39 @@ def related_content(request, slug):
                     "filter": {
                         "bool": {
                             "must": {
-                                "term": { "privacy": Event.PRIVACY_PUBLIC }
+                                "term": {"privacy": Event.PRIVACY_PUBLIC}
                             }
                         }
                     }
                 }
             }
         }
-    print query
 
+    ids = []
     hits = es.search(query, index='events')['hits']
-    print hits
+
     for doc in hits['hits']:
         print "\t", repr(doc['_source']['title']), doc['_id']
-    return hits
-    print "Hello Glo"
+        ids.append(doc['_id'])
+    ids2 = [int(x) for x in ids]
+
     if request.user.is_active:
         if is_contributor(request.user):
             events = Event.objects \
-                          .exclude(Event.PRIVACY_COMPANY) \
-                          .filter(id__in=ids)
-        else: 
+                          .filter(id__in=ids2)
+        else:
             events = Event.objects.scheduled_or_processing()
     else:
         events = Event.objects \
-                      .exclude(privacy=Event.PRIVACY_COMPANY) \
-                      .filter(id__in=ids)
- 
+                      .filter(id__in=ids2)
+
     curated_groups_map = collections.defaultdict(list)
-    curated_groups = (
-        CuratedGroup.objects.all()
-        .values_list('event_id', 'name')
-        .order_by('name')
-    )
-    
-    for event_id, name in curated_groups:
-        curated_groups_map[event_id].append(name)
-                             
+
     def get_curated_groups(event):
-        return curated_groups_map.get(event.id)
+        return curated_groups_map.get('event_id')
 
     context = {
         'events': events,
-        'query': query,
         'get_curated_groups': get_curated_groups,
     }
     print context

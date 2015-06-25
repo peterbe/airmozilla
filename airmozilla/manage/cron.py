@@ -103,6 +103,6 @@ def autocompeter_update():
 
 
 @cronjobs.register
-@capture
+# @capture
 def related_content_indexing():
     related.indexing()
