@@ -1198,7 +1198,8 @@ def related_content(request, slug):
         'get_curated_groups': get_curated_groups,
     }
 
-    return render(request, 'main/es.html', context)
+    return_str = render(request, 'main/es.html', context)
+    return http.HttpResponse(return_str)
 
 
 def channels(request):
