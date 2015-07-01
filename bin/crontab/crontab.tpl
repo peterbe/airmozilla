@@ -42,6 +42,9 @@ HOME=/tmp
 # Every 10 minutes
 */10 * * * * {{ cron }} send_new_event_emails 2>&1 | grep -Ev '(DeprecationWarning|UserWarning|simplejson|from pkg_resources)'
 
+# Every Sunday at 8AM
+0 8 * * 0 {{ cron }} related_content_update 2>&1 | grep -Ev '(DeprecationWarning|UserWarning|simplejson|from pkg_resources)'
+
 # Every 10 minutes
 */10 * * * * {{ cron }} related_content_indexing 2>&1 | grep -Ev '(DeprecationWarning|UserWarning|simplejson|from pkg_resources)'
 
