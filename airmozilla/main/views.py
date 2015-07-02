@@ -1187,14 +1187,13 @@ def related_content(request, slug):
                       .filter(id__in=ids)
 
     curated_groups_map = collections.defaultdict(list)
-    events_list = list(events)
-    events_sorted = sorted(events_list, key=lambda e: ids.index(e.id))
+    events = sorted(events, key=lambda e: ids.index(e.id))
 
     def get_curated_groups(event):
         return curated_groups_map.get('event_id')
 
     context = {
-        'events': events_sorted,
+        'events': events,
         'get_curated_groups': get_curated_groups,
     }
 
