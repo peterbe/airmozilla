@@ -103,7 +103,9 @@ LOGIN_REDIRECT_URL_FAILURE = '/login-failure/'
 
 TEMPLATE_CONTEXT_PROCESSORS += (
     'airmozilla.manage.context_processors.badges',
+    'airmozilla.main.context_processors.base',
     'airmozilla.main.context_processors.nav_bar',
+    'airmozilla.main.context_processors.search_form',
     'airmozilla.main.context_processors.sidebar',
     'airmozilla.main.context_processors.analytics',
     'airmozilla.main.context_processors.dev',
@@ -226,6 +228,9 @@ COOKIES_SECURE = True
 
 # Default for related content
 RELATED_CONTENT_URL = 'http://localhost:9200/'
+
+# Number of related events to display (max)
+RELATED_CONTENT_SIZE = 6
 
 # Defaults for Mozillians
 MOZILLIANS_API_BASE = 'https://mozillians.org'
