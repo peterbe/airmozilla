@@ -1119,9 +1119,15 @@ def related_content(request, slug):
     event = get_object_or_404(Event, slug=slug)
 
     es = pyelasticsearch.ElasticSearch(settings.RELATED_CONTENT_URL)
+
+    fields = ['title', 'tags']
+    if list(event.channels.all()) != [
+            Channel.objects.get(slug=settings.DEFAULT_CHANNEL_SLUG)]:
+        fields.append('channel')
+
     mlt_query = {
         "more_like_this": {
-            "fields": ["title", "tags", "channels"],
+            "fields": fields,
             "docs": [
                 {
                     "_index": "events",

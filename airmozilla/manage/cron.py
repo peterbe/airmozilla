@@ -104,7 +104,7 @@ def autocompeter_update():
 
 @cronjobs.register
 # @capture
-def related_content_update():
+def related_content_reindex():
     related.index(all=True, flush_first=True)
 
 
