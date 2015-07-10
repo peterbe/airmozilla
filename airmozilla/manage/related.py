@@ -31,7 +31,18 @@ def index(all=False, flush_first=False, since=datetime.timedelta(minutes=10)):
                 'tags': [x.name for x in event.tags.all()],
                 'channels': [x.name for x in event.channels.all()],
             },
+            {
+                "analysis": {
+                    "analyzer": {
+                        "string_lowercase": {
+                            "tokenizer": "keyword",
+                            "filter": "tags"
+                        }
+                    }
+                }
+            },
             id=event.id,
+
         )
 
     es.refresh()
