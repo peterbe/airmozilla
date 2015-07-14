@@ -1130,7 +1130,8 @@ def related_content(request, slug):
             "fields": fields,
             "docs": [
                 {
-                    "_index": "events",
+                    "_index": settings.ELASTICSEARCH_PREFIX
+                    + settings.ELASTICSEARCH_INDEX,
                     "_type": "event",
                     "_id": event.id
                 }],
@@ -1181,10 +1182,13 @@ def related_content(request, slug):
     hits = es.search(query, index='events')['hits']
 
     for doc in hits['hits']:
-        print "\t", repr(doc['_source']['title']), doc['_id']
+        print "\t", repr(doc['_source']['title']), doc['_id'], doc['_score']
         ids.append(int(doc['_id']))
 
-    events = Event.objects.scheduled_or_processing().filter(id__in=ids)
+    events = Event.objects.scheduled_or_processing() \
+        .filter(id__in=ids) \
+        .exclude(status=Event.STATUS_REMOVED)
+
     if request.user.is_active:
         if is_contributor(request.user):
             events = events.exclude(privacy=Event.PRIVACY_COMPANY)
