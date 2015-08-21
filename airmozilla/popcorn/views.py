@@ -96,7 +96,8 @@ def popcorn_data(request):
 
     for edit in PopcornEdit.objects.filter(
             event__slug=slug,
-            status=PopcornEdit.STATUS_SUCCESS).order_by('-created')[:1]:
+            status=PopcornEdit.STATUS_SUCCESS,
+            is_active=True).order_by('-created')[:1]:
         data = edit.data
         return {'data': edit.data}
     else:
@@ -133,6 +134,14 @@ def save_edit(request):
 
     event = get_object_or_404(Event, slug=slug)
 
+    # Check to see if there is already an edit waiting to be processed
+    for p_edit in PopcornEdit.objects.filter(
+            event__slug=slug,
+            is_active=True).order_by('-created')[:1]:
+        if p_edit.status != PopcornEdit.STATUS_SUCCESS:
+            msg = 'Already processing edit. Please try again soon.'
+            return http.HttpResponseForbidden(msg)
+
     edit = PopcornEdit.objects.create(
         event=event,
         status=PopcornEdit.STATUS_PENDING,
@@ -143,6 +152,61 @@ def save_edit(request):
     return {
         'id': edit.id,
     }
+
+@json_view
+def revert(request):
+    tag = request.POST.get('tag')
+    event_id = request.POST.get('event_id')
+
+    event = Event.objects.get(id=event_id)
+    vidly_submission = VidlySubmission.objects.get(tag=tag, event=event)
+
+    migrate_submission(vidly_submission)
+
+    edits = PopcornEdit.objects.filter(
+        event=event
+    ).order_by('-created')
+    for edit in edits:
+        print edit.upload == None
+        if edit.upload.url != vidly_submission.url:
+            edit.is_active = False
+            edit.save
+        else:
+            break
+
+    return http.HttpResponse('OK\n')
+
+def edit_status(request, slug):
+    event = get_object_or_404(Event, slug=slug)
+
+    edits = PopcornEdit.objects.filter(
+        event=event,
+        status__in=[
+            PopcornEdit.STATUS_PENDING,
+            PopcornEdit.STATUS_PROCESSING,
+            PopcornEdit.STATUS_SUCCESS
+        ],
+        is_active=True,
+    ).order_by('-created')
+
+    first_submission = VidlySubmission.objects.filter(event=event).order_by('-submission_time')[0]
+
+    for edit in edits:
+        if edit.status == PopcornEdit.STATUS_SUCCESS:
+            edit._tag = VidlySubmission.objects.get(
+                event=event,
+                url=edit.upload.url,
+            ).tag
+
+    context = {
+        'PopcornEdit': PopcornEdit,
+        'edits': edits,
+        'event': event,
+        'VidlySubmission': VidlySubmission,
+        'first_submission': first_submission,
+    }
+
+    return render(request, 'popcorn/status.html', context)
 
 
 # Note that this view is publically available.
@@ -222,8 +286,17 @@ class EditorView(EventView):
         if not self.can_edit_event(event, request):
             return self.cant_edit_event(event, request)
 
+        edit = None
+        for p_edit in PopcornEdit.objects.filter(
+                event__slug=slug,
+                status=PopcornEdit.STATUS_SUCCESS,
+                is_active=True).order_by('-created')[:1]:
+            edit = p_edit
+
         context = {
             'event': event,
+            'edit': edit,
+            'PopcornEdit': PopcornEdit,
             'slug': slug,
         }
 

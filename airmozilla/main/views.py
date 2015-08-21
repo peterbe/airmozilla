@@ -346,6 +346,8 @@ class EventView(View):
         if not self.can_view_event(event, request):
             return self.cant_view_event(event, request)
 
+        tag = request.GET.get('tag')
+
         warning = None
         ok_statuses = (
             Event.STATUS_SCHEDULED,
@@ -385,6 +387,9 @@ class EventView(View):
             }
             if isinstance(event.template_environment, dict):
                 context.update(event.template_environment)
+            if tag:
+                VidlySubmission.objects.get(tag=tag, event=event)
+                context['tag'] = tag
             template = Template(event.template.content)
             try:
                 template_tagged = template.render(context)
@@ -449,7 +454,7 @@ class EventView(View):
             event.has_vidly_template() and event.template_environment
         ):
             if event.template_environment.get('tag'):
-                context['vidly_tag'] = event.template_environment['tag']
+                context['vidly_tag'] = tag or event.template_environment['tag']
                 hd = False  # default
                 vidly_submissions = (
                     VidlySubmission.objects
