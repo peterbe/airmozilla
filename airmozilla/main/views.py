@@ -388,7 +388,15 @@ class EventView(View):
             if isinstance(event.template_environment, dict):
                 context.update(event.template_environment)
             if tag:
-                VidlySubmission.objects.get(tag=tag, event=event)
+
+                submissions = VidlySubmission.objects.filter(
+                    tag=tag,
+                    event=event
+                )
+                if not submissions.exists():
+                    return http.HttpResponseBadRequest(
+                        'Tag %s does not exist for this event' % (tag,)
+                    )
                 context['tag'] = tag
             template = Template(event.template.content)
             try:

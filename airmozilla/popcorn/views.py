@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.db.models import Q
 
 from airmozilla.main.helpers import thumbnail
 from airmozilla.main.models import Event, VidlySubmission
@@ -288,10 +289,22 @@ class EditorView(EventView):
 
         edit = None
         for p_edit in PopcornEdit.objects.filter(
-                event__slug=slug,
+                event=event,
                 status=PopcornEdit.STATUS_SUCCESS,
                 is_active=True).order_by('-created')[:1]:
             edit = p_edit
+
+        pending_or_processing = (
+            PopcornEdit.objects
+            .filter(event=event, is_active=True)
+            .filter(
+                Q(status=PopcornEdit.STATUS_PENDING) |
+                Q(status=PopcornEdit.STATUS_PROCESSING)
+            )
+            .exists()
+        )
+        if pending_or_processing:
+            return redirect('popcorn:edit_status', event.slug)
 
         context = {
             'event': event,
