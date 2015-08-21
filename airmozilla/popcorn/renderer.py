@@ -79,6 +79,8 @@ def render_edit(edit_id, verbose=False):
         size=filesize,
         upload_time=int(end - start)
     )
+    edit.upload = upload
+    edit.save()
 
     if verbose:
         print 'Upload object created with id: %s' % upload.id

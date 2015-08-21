@@ -194,10 +194,17 @@ def edit_status(request, slug):
 
     for edit in edits:
         if edit.status == PopcornEdit.STATUS_SUCCESS:
-            edit._tag = VidlySubmission.objects.get(
+
+            submission = VidlySubmission.objects.get(
                 event=event,
                 url=edit.upload.url,
-            ).tag
+            )
+            edit._tag = submission.tag
+            edit._tag_finished = submission.finished
+            # edit._tag = VidlySubmission.objects.get(
+            #     event=event,
+            #     url=edit.upload.url,
+            # ).tag
 
     context = {
         'PopcornEdit': PopcornEdit,

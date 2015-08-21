@@ -66,7 +66,11 @@ Air Mozilla | Mozilla, in Video
         </td>
         <td>
           {% if edit._tag  and edit._tag != event.template_environment['tag'] %}
-          <button onclick="revert('{{ edit._tag }}')">Revert to this version</button>
+            {% if edit._tag_finished %}
+              <button onclick="revert('{{ edit._tag }}')">Revert to this version</button>
+            {% else %}
+              <i>Waiting for transcoding to finish</i>
+            {% endif %}
           {% endif %}
         </td>
       </tr>
