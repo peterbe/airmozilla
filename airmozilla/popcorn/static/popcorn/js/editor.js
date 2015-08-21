@@ -5,7 +5,7 @@ $(document).ready(function () {
         })
         .done(function (response) {
             if(response.data) {
-                PopcornEditor.loadInfo(response);
+                PopcornEditor.loadInfo(response.data);
             }
             else {
                 PopcornEditor.loadInfo(

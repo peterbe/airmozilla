@@ -155,11 +155,13 @@ def save_edit(request):
     }
 
 @json_view
+@login_required
 def revert(request):
     tag = request.POST.get('tag')
     event_id = request.POST.get('event_id')
 
     event = Event.objects.get(id=event_id)
+    # event.template_environment['tag'] = tag
     vidly_submission = VidlySubmission.objects.get(tag=tag, event=event)
 
     migrate_submission(vidly_submission)
@@ -171,12 +173,14 @@ def revert(request):
         print edit.upload == None
         if edit.upload.url != vidly_submission.url:
             edit.is_active = False
-            edit.save
+            edit.save()
         else:
             break
 
     return http.HttpResponse('OK\n')
 
+
+@login_required
 def edit_status(request, slug):
     event = get_object_or_404(Event, slug=slug)
 
@@ -190,8 +194,13 @@ def edit_status(request, slug):
         is_active=True,
     ).order_by('-created')
 
-    first_submission = VidlySubmission.objects.filter(event=event).order_by('-submission_time')[0]
+    first_submission, = (
+        VidlySubmission.objects
+        .filter(event=event, finished__isnull=False)
+        .order_by('submission_time')
+    )[:1]
 
+    any_revertable_edits = False
     for edit in edits:
         if edit.status == PopcornEdit.STATUS_SUCCESS:
 
@@ -201,10 +210,24 @@ def edit_status(request, slug):
             )
             edit._tag = submission.tag
             edit._tag_finished = submission.finished
-            # edit._tag = VidlySubmission.objects.get(
-            #     event=event,
-            #     url=edit.upload.url,
-            # ).tag
+            if submission.finished:
+                any_revertable_edits = True
+
+    is_processing = is_waiting = is_transcoding = False
+    if edits:
+        status = edits[0].status
+        if status == PopcornEdit.STATUS_PENDING:
+            is_waiting = True
+        elif status == PopcornEdit.STATUS_PROCESSING:
+            is_processing = True
+        elif status == PopcornEdit.STATUS_SUCCESS:
+            # but has the vidlysubmission finished?
+            submission = VidlySubmission.objects.get(
+                event=event,
+                url=edit.upload.url
+            )
+            if not submission.finished:
+                is_transcoding = True
 
     context = {
         'PopcornEdit': PopcornEdit,
@@ -212,6 +235,10 @@ def edit_status(request, slug):
         'event': event,
         'VidlySubmission': VidlySubmission,
         'first_submission': first_submission,
+        'is_processing': is_processing,
+        'is_waiting': is_waiting,
+        'is_transcoding': is_transcoding,
+        'any_revertable_edits': any_revertable_edits,
     }
 
     return render(request, 'popcorn/status.html', context)
