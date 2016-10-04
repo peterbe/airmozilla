@@ -465,6 +465,10 @@ CSP_MEDIA_SRC = (
     'blob:',
     'vid.ly',
     'd3fenhwk93s16g.cloudfront.net',  # vidly
+    # These next 3 are for old legacy videos.
+    'videos.mozilla.org',
+    'videos.cdn.mozilla.net',
+    'videos-real-origin.cdn.mozilla.net',
 )
 CSP_STYLE_SRC = (
     "'self'",
