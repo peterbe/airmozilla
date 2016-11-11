@@ -7,9 +7,10 @@ Sign In | {{ super() }}
 
 {% block extra_head %}
 {{ super() }}
-<meta name="auth0-client-id" content="{{ AUTH0_CLIENT_ID }}">
+{#<meta name="auth0-client-id" content="{{ AUTH0_CLIENT_ID }}">
 <meta name="auth0-domain" content="{{ AUTH0_DOMAIN }}">
-<meta name="auth0-callback-url" content="{{ AUTH0_CALLBACK_URL }}">
+<meta name="auth0-callback-url" content="{{ AUTH0_CALLBACK_URL }}">#}
+<link rel="preconnect" href="{{ hosted_auth0_page_url }}">
 {% endblock %}
 
 {% block site_css %}
@@ -19,13 +20,13 @@ Sign In | {{ super() }}
 
 {% block site_js %}
   {{ super() }}
-  <script src="https://cdn.auth0.com/js/lock-passwordless-2.2.min.js"></script>
-  {% javascript 'signin' %}
+  {#<script src="https://cdn.auth0.com/js/lock-passwordless-2.2.min.js"></script>#}
+  {#{% javascript 'signin' %}#}
 {% endblock %}
 
 
 {% block content_main %}
-  <h2 class="section-title">Sign In</h2>
+  <!-- <h2 class="section-title">Sign In</h2> -->
   {% if request.user.is_active %}
     <p>
       You are already signed in as
@@ -40,21 +41,28 @@ Sign In | {{ super() }}
     </form>
   {% else %}
 
-    <p class="login-lock">
+    <div class="signin-link">
+      <form action="{{ hosted_auth0_page_url }}">
+        <input type="hidden" name="client" value="{{ AUTH0_CLIENT_ID }}" />
+        <button type="submit">Sign In</button>
+      </form>
+
+      <!-- <p>
+        <a href="{{ hosted_auth0_page_url }}">Sign In</a>
+      </p> -->
+      <p>
+        Unless you are <b>Mozilla staff</b>
+        your <b>email has to belong to a <i>vouched Mozillians.org account</i></b>.
+      </p>
+
+    </div>
+    <!-- <p class="login-lock">
       <a href="#"><img src="{{ static('authentication/images/lock-logo.png') }}" width="150"/></a>
       <br />
       <a href="#">Click to log in with Auth0</a>
-    </p>
+    </p> -->
 
-    <p>
-      Unless you are <b>Mozilla staff</b>
-      your <b>email has to belong to a <i>vouched Mozillians.org account</i></b>.
 
-    </p>
-    <p>
-      We use <a href="https://auth0.com" target="_blank" rel="noopener">Auth0.com</a>
-      to handle the authentication.
-    </p>
 
   {% endif %}
 

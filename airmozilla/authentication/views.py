@@ -103,9 +103,14 @@ class CustomBrowserIDVerify(Verify):
 def signin(request):
     context = {
         'AUTH0_CLIENT_ID': settings.AUTH0_CLIENT_ID,
-        'AUTH0_DOMAIN': settings.AUTH0_DOMAIN,
-        'AUTH0_CALLBACK_URL': settings.AUTH0_CALLBACK_URL,
+        # 'AUTH0_DOMAIN': settings.AUTH0_DOMAIN,
+        # 'AUTH0_CALLBACK_URL': settings.AUTH0_CALLBACK_URL,
     }
+    context['hosted_auth0_page_url'] = (
+        'https://{}/login'.format(
+            settings.AUTH0_DOMAIN,
+        )
+    )
     return render(request, 'authentication/signin.html', context)
 
 
